@@ -1,0 +1,8 @@
+*.apk
+*.idsig
+classes/
+dexout/
+res.zip
+unsigned.apk
+aligned.apk
+.DS_Store
