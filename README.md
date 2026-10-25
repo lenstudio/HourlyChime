@@ -1,57 +1,59 @@
-# HourlyChime 整点报时
+# HourlyChime
 
-一个极简的 Android 整点报时 / 定时提醒应用（`com.len.hourlychime`）。无任何依赖库、无布局 XML，纯程序化 UI；代码本体不到 13KB，含 8 个内置铃声后单 APK 约 1.3MB。为替代已停止维护的 com.caynax.hourlychime 而自研。
+[简体中文说明](README_CN.md)
 
-## 功能
+A minimalist Android hourly chime / timed reminder app (`com.len.hourlychime`). Zero library dependencies, no layout XML — a fully programmatic UI. The code itself is under 13 KB; with 8 built-in ringtones the single APK is about 1.6 MB. Written to replace the unmaintained `com.caynax.hourlychime`.
 
-- **多方案调度**：方案 = 名称 + 适用星期 + 规则集 + 铃声 + 音量，可自由组合
-- **规则语法**：`H:M[-H:M][/步长]`，逗号分隔多条，如 `9:00-18:00/60, 12:30`
-- **铃声三来源**：App 内置 / 系统音效（RingtoneManager 枚举）/ 自选文件（SAF 文件选择器，持久授权）
-- **音量独立控制**：临时调整 STREAM_NOTIFICATION 播放，播完自动恢复原音量
-- **法定工作日 / 休息日同步**：内置 `assets/holidays.json`，规则可区分工作日/周末/节假日
-- **可靠触发**：AlarmManager 精确闹钟 + `goAsync()` 保证播完才结束；开机 / 时间变更 / 时区变更自动重排；回到主界面自愈重排
-- 支持振动、沉浸式状态栏
+## Features
 
-## 源码结构
+- **Multi-profile scheduling** — a profile = name + applicable weekdays + rule set + ringtone + volume, freely combinable
+- **Rule syntax** — `H:M[-H:M][/step]`, comma-separated, e.g. `9:00-18:00/60, 12:30`
+- **Three ringtone sources** — app built-in / system sounds (enumerated via RingtoneManager) / user-picked file (SAF picker with persisted URI grant)
+- **Independent volume** — temporarily switches STREAM_NOTIFICATION for playback, restores the original level afterwards
+- **Statutory workday/holiday awareness** — bundled `assets/holidays.json`; profiles distinguish workdays / weekends / public holidays
+- **Reliable firing** — exact AlarmManager alarms + `goAsync()` so playback finishes before the receiver ends; automatic rescheduling on boot, time change and timezone change; self-healing reschedule whenever the main screen resumes
+- Vibration support, immersive status bar
 
-| 文件 | 说明 |
+## Source Layout
+
+| File | Purpose |
 |---|---|
-| `Scheduler.java` | 数据与调度核心：方案(JSON)解析、规则展开、下一次触发时间计算 |
-| `ChimeReceiver.java` | 广播接收：播放铃声 + 排下一次闹钟，sys:/doc:/asset 三分支播放 |
-| `MainActivity.java` | 主界面：方案列表、总开关、振动开关 |
-| `ProfileActivity.java` | 方案编辑：规则、星期、铃声选择（三来源）、音量、试听 |
-| `Ui.java` | 程序化 UI 工具（沉浸式状态栏等） |
+| `Scheduler.java` | Data & scheduling core: profile (JSON) parsing, rule expansion, next-trigger computation |
+| `ChimeReceiver.java` | Broadcast receiver: plays the ringtone and schedules the next alarm; three-branch playback (sys: / doc: / asset) |
+| `MainActivity.java` | Main screen: profile list, master toggle, vibration toggle |
+| `ProfileActivity.java` | Profile editor: rules, weekdays, ringtone picker (three sources), volume, audition |
+| `Ui.java` | Programmatic UI helpers (immersive status bar, etc.) |
 
-## 构建
+## Build
 
-需要 Android SDK（build-tools 34 / platform android-33）与 JDK 17：
+Requires an Android SDK (build-tools 34 / platform android-33) and JDK 17:
 
 ```sh
-./build.sh            # 产出 HourlyChime.apk（需自备 debug.keystore）
+./build.sh            # produces HourlyChime.apk (provide your own debug.keystore)
 ```
 
-或手动流程见 `build.sh` 内注释。关键点：
+See the comments inside `build.sh` for the manual steps. Key points:
 
-- `aapt2 link` 必须带 `--min-sdk-version 30 --target-sdk-version 33`（否则部分设备安装报 -26）
-- 无布局 XML，资源仅一个启动器图标；`assets/` 随包打入
+- `aapt2 link` must pass `--min-sdk-version 30 --target-sdk-version 33` (otherwise some devices fail install with error -26)
+- No layout XML; the only resource is a launcher icon; `assets/` is packed in via `-A`
 
-## 内置铃声
+## Built-in Ringtones
 
-`assets/` 下随包打入 8 个内置铃声，文件名与应用内编号一一对应（`Ringtone N` → `ringN.*`，格式保持原始 mp3/ogg）：
+Eight ringtones ship in `assets/`, numbered to match the in-app names (`Ringtone N` → `ringN.*`; extensions keep their original mp3/ogg format):
 
-| 文件 | 应用内名称 | 预置用途 |
+| File | In-app name | Default usage |
 |---|---|---|
-| `ring1.mp3` | Ringtone 1 (上下班提醒铃) | 特铃-节点 |
-| `ring2.mp3` | Ringtone 2 (工作日正点报时) | 工作日-整点 |
-| `ring3.ogg` | Ringtone 3 (工作日半点报时) | 工作日-半点 |
-| `ring4.ogg` | Ringtone 4 (休息日整点报时) | 特铃-周末 |
-| `ring5.mp3` | Ringtone 5 (短叮) | — |
-| `ring6.mp3` | Ringtone 6 (双音叮咚) | — |
-| `ring7.mp3` | Ringtone 7 (门铃叮咚) | — |
-| `ring8.mp3` | Ringtone 8 (家电叮) | — |
+| `ring1.mp3` | Ringtone 1 (commute reminder) | Special - time nodes |
+| `ring2.mp3` | Ringtone 2 (workday full-hour chime) | Workdays - hourly |
+| `ring3.ogg` | Ringtone 3 (workday half-hour chime) | Workdays - half-hourly |
+| `ring4.ogg` | Ringtone 4 (rest-day hourly chime) | Special - weekends |
+| `ring5.mp3` | Ringtone 5 (short ding) | — |
+| `ring6.mp3` | Ringtone 6 (double ding-dong) | — |
+| `ring7.mp3` | Ringtone 7 (doorbell ding-dong) | — |
+| `ring8.mp3` | Ringtone 8 (appliance beep) | — |
 
-代码中铃声 key（`sing` / `bell` / `wind` / `chimes` / `d1`~`d4`，存于用户偏好）与文件名解耦，映射见 `ChimeReceiver.java`。
+Ringtone keys in code (`sing` / `bell` / `wind` / `chimes` / `d1`~`d4`, stored in user preferences) are decoupled from filenames; see the switch in `ChimeReceiver.java`.
 
-## 许可
+## License
 
-源码按 MIT 许可发布（见 LICENSE）。铃声音频文件不在许可范围内。
+Source code is released under the MIT License (see LICENSE). The audio files under `assets/` are **not** covered by that license (sourced from the legacy app and Freesound) and are provided for personal use.
