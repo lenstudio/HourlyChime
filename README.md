@@ -29,13 +29,14 @@ A minimalist Android hourly chime / timed reminder app (`com.len.hourlychime`). 
 Requires an Android SDK (build-tools 34 / platform android-33) and JDK 17:
 
 ```sh
-./build.sh            # produces HourlyChime.apk (provide your own debug.keystore)
+./build.sh            # produces HourlyChime.apk
 ```
 
 See the comments inside `build.sh` for the manual steps. Key points:
 
 - `aapt2 link` must pass `--min-sdk-version 30 --target-sdk-version 33` (otherwise some devices fail install with error -26)
 - No layout XML; the only resource is a launcher icon; `assets/` is packed in via `-A`
+- **Signing**: the script picks up a repo-local `release.keystore` (+ `release.keystore.pass`, both git-ignored) if present, otherwise falls back to a debug key; override with `KS` / `KSPASS` / `KSALIAS` environment variables
 
 ## Built-in Ringtones
 

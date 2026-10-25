@@ -29,13 +29,14 @@
 需要 Android SDK（build-tools 34 / platform android-33）与 JDK 17：
 
 ```sh
-./build.sh            # 产出 HourlyChime.apk（需自备 debug.keystore）
+./build.sh            # 产出 HourlyChime.apk
 ```
 
 或手动流程见 `build.sh` 内注释。关键点：
 
 - `aapt2 link` 必须带 `--min-sdk-version 30 --target-sdk-version 33`（否则部分设备安装报 -26）
 - 无布局 XML，资源仅一个启动器图标；`assets/` 随包打入
+- **签名**：脚本优先使用仓库本地 `release.keystore`（+ `release.keystore.pass`，均已 git-ignore），不存在则回退 debug 密钥；可用 `KS` / `KSPASS` / `KSALIAS` 环境变量覆盖
 
 ## 内置铃声
 

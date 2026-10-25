@@ -10,9 +10,19 @@ AJ=$SDK/platforms/android-33/android.jar
 export JAVA_HOME=${JAVA_HOME:-$HOME/android/jdk17/Contents/Home}
 export PATH=$JAVA_HOME/bin:$PATH
 
-KS=${KS:-$HOME/android/boot-to-tv/debug.keystore}
-KSPASS=${KSPASS:-android}
-KSALIAS=${KSALIAS:-boottotv}
+# 签名密钥：优先用脚本同目录的 release.keystore + release.keystore.pass（不入库），
+# 否则回退 boot-to-tv debug.keystore；可用 KS/KSPASS/KSALIAS 环境变量覆盖
+if [ -z "$KS" ]; then
+    if [ -f release.keystore ] && [ -f release.keystore.pass ]; then
+        KS=release.keystore
+        KSPASS=$(cat release.keystore.pass)
+        KSALIAS=${KSALIAS:-hourlychime}
+    else
+        KS=$HOME/android/boot-to-tv/debug.keystore
+        KSPASS=android
+        KSALIAS=boottotv
+    fi
+fi
 
 rm -rf classes dexout res.zip unsigned.apk aligned.apk HourlyChime.apk
 mkdir -p classes dexout
