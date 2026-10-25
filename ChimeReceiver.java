@@ -77,14 +77,15 @@ public class ChimeReceiver extends BroadcastReceiver {
             } else {
                 String file;
                 switch (ring) {
-                    case "bell":   file = "bell.mp3";   break;
-                    case "wind":   file = "wind.ogg";   break;
-                    case "sing":   file = "sing.mp3";   break;
-                    case "d1":     file = "d1.mp3";     break;
-                    case "d2":     file = "d2.mp3";     break;
-                    case "d3":     file = "d3.mp3";     break;
-                    case "d4":     file = "d4.mp3";     break;
-                    default:       file = "chimes.ogg"; break;
+                    // 铃声 key（存于偏好）与 assets 文件名解耦，文件名归一化为 ring1~ring8
+                    case "bell":   file = "ring2.mp3";  break;
+                    case "wind":   file = "ring3.ogg";  break;
+                    case "sing":   file = "ring1.mp3";  break;
+                    case "d1":     file = "ring5.mp3";  break;
+                    case "d2":     file = "ring6.mp3";  break;
+                    case "d3":     file = "ring7.mp3";  break;
+                    case "d4":     file = "ring8.mp3";  break;
+                    default:       file = "ring4.ogg";  break;
                 }
                 AssetFileDescriptor fd = ctx.getAssets().openFd(file);
                 mp.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());

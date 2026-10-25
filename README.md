@@ -1,6 +1,6 @@
 # HourlyChime 整点报时
 
-一个极简的 Android 整点报时 / 定时提醒应用（`com.len.hourlychime`）。无任何依赖库、无布局 XML，纯程序化 UI，单 APK 约 13KB。为替代已停止维护的 com.caynax.hourlychime 而自研。
+一个极简的 Android 整点报时 / 定时提醒应用（`com.len.hourlychime`）。无任何依赖库、无布局 XML，纯程序化 UI；代码本体不到 13KB，含 8 个内置铃声后单 APK 约 1.3MB。为替代已停止维护的 com.caynax.hourlychime 而自研。
 
 ## 功能
 
@@ -35,16 +35,22 @@
 - `aapt2 link` 必须带 `--min-sdk-version 30 --target-sdk-version 33`（否则部分设备安装报 -26）
 - 无布局 XML，资源仅一个启动器图标；`assets/` 随包打入
 
-## 铃声音频（不入库）
+## 内置铃声
 
-出于版权考虑，本仓库不包含 `assets/` 下的铃声音频文件（原为旧应用提取及 Freesound 素材）。自行放置以下任一/全部文件后即可构建出带内置铃声的包：
+`assets/` 下随包打入 8 个内置铃声，文件名与应用内编号一一对应（`Ringtone N` → `ringN.*`，格式保持原始 mp3/ogg）：
 
-```
-assets/sing.mp3   assets/bell.mp3   assets/wind.ogg   assets/chimes.ogg
-assets/d1.mp3     assets/d2.mp3     assets/d3.mp3     assets/d4.mp3
-```
+| 文件 | 应用内名称 | 预置用途 |
+|---|---|---|
+| `ring1.mp3` | Ringtone 1 (上下班提醒铃) | 特铃-节点 |
+| `ring2.mp3` | Ringtone 2 (工作日正点报时) | 工作日-整点 |
+| `ring3.ogg` | Ringtone 3 (工作日半点报时) | 工作日-半点 |
+| `ring4.ogg` | Ringtone 4 (休息日整点报时) | 特铃-周末 |
+| `ring5.mp3` | Ringtone 5 (短叮) | — |
+| `ring6.mp3` | Ringtone 6 (双音叮咚) | — |
+| `ring7.mp3` | Ringtone 7 (门铃叮咚) | — |
+| `ring8.mp3` | Ringtone 8 (家电叮) | — |
 
-缺失对应文件时该铃声选项播放会失败，但 App 其余功能（系统音效 / 自选文件铃声）不受影响。
+代码中铃声 key（`sing` / `bell` / `wind` / `chimes` / `d1`~`d4`，存于用户偏好）与文件名解耦，映射见 `ChimeReceiver.java`。
 
 ## 许可
 
