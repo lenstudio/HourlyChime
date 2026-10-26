@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Campana Horaria</string>
+    <string name="subtitle">Hourly Chime · sin servicio persistente</string>
+
+    <string name="date_clock">EEE d \u0027de\u0027 MMM</string>
+    <string name="date_hero">EEEE d \u0027de\u0027 MMM</string>
+    <string name="today">Hoy: %1$s</string>
+    <string name="next_alarm">PRÓXIMA CAMPANA</string>
+    <string name="state_running">Activo · sin procesos en segundo plano, suena en punto</string>
+    <string name="state_off">Desactivado</string>
+    <string name="state_off_hint">Active el interruptor principal para reanudar</string>
+
+    <string name="master_switch">Interruptor principal</string>
+    <string name="vibrate_together">Vibrar al sonar</string>
+    <string name="section_profiles">  Perfiles</string>
+    <string name="new_profile">＋ Nuevo perfil</string>
+
+    <string name="profile_default">Perfil</string>
+    <string name="every_day">Todos los días</string>
+    <string name="legal_workday">Días laborables oficiales</string>
+    <string name="legal_restday">Días de descanso oficiales</string>
+
+    <string name="create_profile">Nuevo perfil</string>
+    <string name="edit_profile">Editar perfil</string>
+    <string name="name_label">Nombre</string>
+    <string name="name_hint">Nombre del perfil</string>
+    <string name="effective_days">Días activos</string>
+    <string name="mode_by_week">Por día de la semana (marcar abajo)</string>
+    <string name="mode_legal_work">Laborables oficiales (fiestas libres, recuperación laborable)</string>
+    <string name="mode_legal_rest">Descanso oficial (fines de semana + fiestas)</string>
+    <string name="time_rules">Reglas horarias (marca franjas de media hora)</string>
+    <string name="ringtone">Tono</string>
+    <string name="pick_audio">📂 Elegir archivo de audio…</string>
+    <string name="preview">▶ Escuchar</string>
+    <string name="stop">■ Parar</string>
+    <string name="volume_follow">Volumen: según el sistema</string>
+    <string name="volume_pct">Volumen %1$d%% (canal de alarma, ignora el silencio)</string>
+    <string name="delete">Eliminar</string>
+    <string name="save">Guardar</string>
+    <string name="custom_selected">Archivo personalizado (elegido, toque abajo para cambiar)</string>
+    <string name="custom_unselected">Archivo personalizado (elija uno para aplicar)</string>
+
+    <string name="delete_title">Eliminar perfil</string>
+    <string name="delete_msg">¿Eliminar \"%1$s\"?\n(Los perfiles integrados se restauran solos)</string>
+    <string name="cancel">Cancelar</string>
+    <string name="deleted">Eliminado</string>
+    <string name="save_failed">Error al guardar: %1$s</string>
+    <string name="rule_preview">Reglas: %1$s</string>
+    <string name="none_selected">Ninguna franja marcada</string>
+    <string name="err_select_ring">Elija primero un tono</string>
+    <string name="err_custom_not_picked">Aún no ha elegido el archivo</string>
+    <string name="err_at_least_one">Marque al menos una franja</string>
+
+    <string name="holiday">Festivo</string>
+    <string name="workday">Laborable</string>
+    <string name="sunday">Domingo</string>
+    <string name="weekend">Fin de semana</string>
+
+    <string-array name="day_short">
+        <item>L</item><item>M</item><item>X</item><item>J</item><item>V</item><item>S</item><item>D</item>
+    </string-array>
+    <string-array name="day_full">
+        <item>Lun</item><item>Mar</item><item>Mié</item><item>Jue</item><item>Vie</item><item>Sáb</item><item>Dom</item>
+    </string-array>
+
+    <string name="ring1_label">Tono 1 (campana de entrada/salida)</string>
+    <string name="ring2_label">Tono 2 (horas en día laborable)</string>
+    <string name="ring3_label">Tono 3 (medias horas laborables)</string>
+    <string name="ring4_label">Tono 4 (horas en día de descanso)</string>
+    <string name="ring5_label">Tono 5 (ding corto)</string>
+    <string name="ring6_label">Tono 6 (ding-dong doble)</string>
+    <string name="ring7_label">Tono 7 (timbre de puerta)</string>
+    <string name="ring8_label">Tono 8 (ding de electrodoméstico)</string>
+    <string name="ring_sys">Sonido del sistema</string>
+
+    <string name="prof_node">Especial – nodos (prioridad alta)</string>
+    <string name="prof_wd_hourly">Laborable – en punto</string>
+    <string name="prof_wd_half">Laborable – media hora</string>
+    <string name="prof_weekend">Especial – fin de semana</string>
+</resources>

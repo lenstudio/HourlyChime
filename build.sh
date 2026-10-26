@@ -24,18 +24,20 @@ if [ -z "$KS" ]; then
     fi
 fi
 
-rm -rf classes dexout res.zip unsigned.apk aligned.apk HourlyChime.apk
-mkdir -p classes dexout
+rm -rf classes dexout gen res.zip unsigned.apk aligned.apk HourlyChime.apk
+mkdir -p classes dexout gen
 
-# 1. 编译资源（仅启动器图标）
+# 1. 编译资源（启动器图标 + 多语言 strings）
 $BT/aapt2 compile --dir res -o res.zip
 
-# 2. 链接生成基础 APK（注意 --min/--target 必须显式指定）
+# 2. 链接生成基础 APK（注意 --min/--target 必须显式指定；--java 生成 R.java）
 $BT/aapt2 link -o unsigned.apk -I $AJ --manifest AndroidManifest.xml \
-    -A assets --min-sdk-version 30 --target-sdk-version 33 res.zip
+    -A assets --min-sdk-version 30 --target-sdk-version 33 \
+    --java gen res.zip
 
 # 3. 编译 Java（无 support 库，纯 framework API）
-$JAVA_HOME/bin/javac -source 8 -target 8 -classpath $AJ -d classes *.java
+$JAVA_HOME/bin/javac -encoding UTF-8 -source 8 -target 8 -classpath $AJ -d classes \
+    $(find gen classes -name '*.java' 2>/dev/null) *.java
 
 # 4. dex 打包（min-api 30）
 $JAVA_HOME/bin/java -cp $BT/lib/d8.jar com.android.tools.r8.D8 --min-api 30 --output dexout $(find classes -name '*.class')
@@ -43,7 +45,9 @@ $JAVA_HOME/bin/java -cp $BT/lib/d8.jar com.android.tools.r8.D8 --min-api 30 --ou
 # 5. 合包、对齐、签名
 (cd dexout && zip -q -j ../unsigned.apk classes.dex)
 $BT/zipalign -f 4 unsigned.apk aligned.apk
-$BT/apksigner sign --ks "$KS" --ks-pass pass:$KSPASS --ks-key-alias $KSALIAS --out HourlyChime.apk aligned.apk
+APKSIGNER=$BT/apksigner
+[ -f "$APKSIGNER.bat" ] && APKSIGNER=$APKSIGNER.bat   # Windows
+$APKSIGNER sign --ks "$KS" --ks-pass pass:$KSPASS --ks-key-alias $KSALIAS --out HourlyChime.apk aligned.apk
 
 ls -la HourlyChime.apk
 echo "done. 安装: adb install -r HourlyChime.apk"

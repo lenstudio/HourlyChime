@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">整点报时</string>
+    <string name="subtitle">Hourly Chime · 无常驻进程</string>
+
+    <string name="date_clock">MM月dd日 EEEE</string>
+    <string name="date_hero">EEEE · MM月dd日</string>
+    <string name="today">今天：%1$s</string>
+    <string name="next_alarm">下 次 响 铃</string>
+    <string name="state_running">运行中 · 零常驻，整点自动唤醒</string>
+    <string name="state_off">已关闭</string>
+    <string name="state_off_hint">打开总开关后恢复报时</string>
+
+    <string name="master_switch">总开关</string>
+    <string name="vibrate_together">响铃同时振动</string>
+    <string name="section_profiles">  报时方案</string>
+    <string name="new_profile">＋ 新建方案</string>
+
+    <string name="profile_default">方案</string>
+    <string name="every_day">每天</string>
+    <string name="legal_workday">法定工作日</string>
+    <string name="legal_restday">法定休息日</string>
+
+    <string name="create_profile">新建方案</string>
+    <string name="edit_profile">编辑方案</string>
+    <string name="name_label">名称</string>
+    <string name="name_hint">方案名称</string>
+    <string name="effective_days">生效日</string>
+    <string name="mode_by_week">按星期（勾选下方）</string>
+    <string name="mode_legal_work">法定工作日（节假日自动休、调休自动上班）</string>
+    <string name="mode_legal_rest">法定休息日（周末+节假日）</string>
+    <string name="time_rules">时段规则（每半小时一格打勾）</string>
+    <string name="ringtone">铃声</string>
+    <string name="pick_audio">📂 选择音频文件…</string>
+    <string name="preview">▶ 试听</string>
+    <string name="stop">■ 停止</string>
+    <string name="volume_follow">音量：跟随系统</string>
+    <string name="volume_pct">音量 %1$d%%（闹钟通道，不受静音限制）</string>
+    <string name="delete">删 除</string>
+    <string name="save">保 存</string>
+    <string name="custom_selected">自定义文件（已选，点下方按钮更换）</string>
+    <string name="custom_unselected">自定义文件（选择后生效）</string>
+
+    <string name="delete_title">删除方案</string>
+    <string name="delete_msg">确定删除「%1$s」吗？\n（预置方案删除后会自动补回）</string>
+    <string name="cancel">取消</string>
+    <string name="deleted">已删除</string>
+    <string name="save_failed">保存失败：%1$s</string>
+    <string name="rule_preview">规则：%1$s</string>
+    <string name="none_selected">未勾选任何时段</string>
+    <string name="err_select_ring">请先选择铃声</string>
+    <string name="err_custom_not_picked">自定义文件还未选择</string>
+    <string name="err_at_least_one">至少勾选一个时段</string>
+
+    <string name="holiday">法定假期</string>
+    <string name="workday">工作日</string>
+    <string name="sunday">周日</string>
+    <string name="weekend">周末</string>
+
+    <string-array name="day_short">
+        <item>一</item><item>二</item><item>三</item><item>四</item><item>五</item><item>六</item><item>日</item>
+    </string-array>
+    <string-array name="day_full">
+        <item>周一</item><item>周二</item><item>周三</item><item>周四</item><item>周五</item><item>周六</item><item>周日</item>
+    </string-array>
+
+    <string name="ring1_label">Ringtone 1（上下班提醒铃）</string>
+    <string name="ring2_label">Ringtone 2（工作日正点报时）</string>
+    <string name="ring3_label">Ringtone 3（工作日半点报时）</string>
+    <string name="ring4_label">Ringtone 4（休息日整点报时）</string>
+    <string name="ring5_label">Ringtone 5（短叮）</string>
+    <string name="ring6_label">Ringtone 6（双音叮咚）</string>
+    <string name="ring7_label">Ringtone 7（门铃叮咚）</string>
+    <string name="ring8_label">Ringtone 8（家电叮）</string>
+    <string name="ring_sys">系统通知音</string>
+
+    <string name="prof_node">特铃-节点(最高优先)</string>
+    <string name="prof_wd_hourly">工作日-整点</string>
+    <string name="prof_wd_half">工作日-半点</string>
+    <string name="prof_weekend">特铃-周末</string>
+</resources>

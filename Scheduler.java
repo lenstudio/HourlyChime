@@ -24,7 +24,7 @@ public class Scheduler {
     public static JSONArray profiles(Context c) {
         SharedPreferences s = sp(c);
         if (!s.getBoolean("seed_v5", false)) {   // v5：接入法定工作日/休息日智能同步
-            JSONArray def = defaults();
+            JSONArray def = defaults(c);
             s.edit().putString("profiles", def.toString())
                     .putBoolean("seed_v5", true).apply();
             return def;
@@ -33,32 +33,32 @@ public class Scheduler {
         catch (Exception e) { return new JSONArray(); }
     }
 
-    /** 迁移旧版配置：节点特铃(最高优先) + 工作日两方案 + 周末特铃；数组顺序即优先级 */
-    private static JSONArray defaults() {
+    /** 迁移旧版配置：节点特铃(最高优先) + 工作日两方案 + 周末特铃；数组顺序即优先级（名称随系统语言） */
+    private static JSONArray defaults(Context c) {
         try {
             JSONArray arr = new JSONArray();
             JSONObject node = new JSONObject();
-            node.put("name", "特铃-节点(最高优先)");
+            node.put("name", c.getString(R.string.prof_node));
             node.put("days", new JSONArray("[2,3,4,5,6]"));
             node.put("rules", new JSONArray("[\"9:00,18:00\",\"12:30,13:30\"]"));
             node.put("dayMode", 1).put("ring", "sing").put("vol", 80).put("on", true);
             arr.put(node);
             JSONObject wdOn = new JSONObject();
-            wdOn.put("name", "工作日-整点");
+            wdOn.put("name", c.getString(R.string.prof_wd_hourly));
             wdOn.put("days", new JSONArray("[2,3,4,5,6]"));
             wdOn.put("rules", new JSONArray(
                     "[\"0:00,7:00-8:00,10:00-17:00,19:00-23:00\",\"9:00,18:00\"]"));
             wdOn.put("dayMode", 1).put("ring", "bell").put("vol", 80).put("on", true);
             arr.put(wdOn);
             JSONObject wdHalf = new JSONObject();
-            wdHalf.put("name", "工作日-半点");
+            wdHalf.put("name", c.getString(R.string.prof_wd_half));
             wdHalf.put("days", new JSONArray("[2,3,4,5,6]"));
             wdHalf.put("rules", new JSONArray(
                     "[\"0:30,6:30-11:30,14:30-23:30\",\"12:30-13:30\"]"));
             wdHalf.put("dayMode", 1).put("ring", "wind").put("vol", 80).put("on", true);
             arr.put(wdHalf);
             JSONObject wk = new JSONObject();
-            wk.put("name", "特铃-周末");
+            wk.put("name", c.getString(R.string.prof_weekend));
             wk.put("days", new JSONArray("[1,7]"));
             wk.put("rules", new JSONArray("[\"0:00,10:00-23:00\"]"));
             wk.put("dayMode", 2).put("ring", "chimes").put("vol", 80).put("on", true);
@@ -111,17 +111,17 @@ public class Scheduler {
         return dow >= Calendar.MONDAY && dow <= Calendar.FRIDAY;
     }
 
-    /** 当天类型标签：法定假期 / 工作日 / 周末(周六) / 周日 */
+    /** 当天类型标签：法定假期 / 工作日 / 周末(周六) / 周日（随系统语言） */
     public static String dayLabel(Context c, Calendar day) {
         loadCal(c);
         String d = String.format(java.util.Locale.US, "%04d-%02d-%02d",
                 day.get(Calendar.YEAR), day.get(Calendar.MONTH) + 1, day.get(Calendar.DAY_OF_MONTH));
-        if (HOLI.contains(d)) return "法定假期";
-        if (WORK.contains(d)) return "工作日";
+        if (HOLI.contains(d)) return c.getString(R.string.holiday);
+        if (WORK.contains(d)) return c.getString(R.string.workday);
         int dow = day.get(Calendar.DAY_OF_WEEK);
-        if (dow == Calendar.SUNDAY) return "周日";
-        if (dow == Calendar.SATURDAY) return "周末";
-        return "工作日";
+        if (dow == Calendar.SUNDAY) return c.getString(R.string.sunday);
+        if (dow == Calendar.SATURDAY) return c.getString(R.string.weekend);
+        return c.getString(R.string.workday);
     }
 
     /** dayMode: 0=按星期(勾选) 1=法定工作日 2=法定休息日 */

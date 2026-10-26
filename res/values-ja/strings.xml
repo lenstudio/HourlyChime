@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">時報チェイム</string>
+    <string name="subtitle">Hourly Chime · 常駐サービスなし</string>
+
+    <string name="date_clock">M月d日(EEE)</string>
+    <string name="date_hero">EEEE・M月d日</string>
+    <string name="today">今日：%1$s</string>
+    <string name="next_alarm">次 の チ ャ イ ム</string>
+    <string name="state_running">実行中 · 常駐ゼロ、毎時0分に自動起床</string>
+    <string name="state_off">オフ</string>
+    <string name="state_off_hint">メインスイッチを入れると再開します</string>
+
+    <string name="master_switch">メインスイッチ</string>
+    <string name="vibrate_together">鳴動時にバイブ</string>
+    <string name="section_profiles">  チャイム設定</string>
+    <string name="new_profile">＋ 新規プロファイル</string>
+
+    <string name="profile_default">プロファイル</string>
+    <string name="every_day">毎日</string>
+    <string name="legal_workday">法定勤務日</string>
+    <string name="legal_restday">法定休日</string>
+
+    <string name="create_profile">新規プロファイル</string>
+    <string name="edit_profile">編集</string>
+    <string name="name_label">名前</string>
+    <string name="name_hint">プロファイル名</string>
+    <string name="effective_days">有効日</string>
+    <string name="mode_by_week">曜日で指定（下で選択）</string>
+    <string name="mode_legal_work">法定勤務日（祝日は休み・振替出勤は自動）</string>
+    <string name="mode_legal_rest">法定休日（土日＋祝日）</string>
+    <string name="time_rules">時間ルール（30分刻みでチェック）</string>
+    <string name="ringtone">着信音</string>
+    <string name="pick_audio">📂 音声ファイルを選択…</string>
+    <string name="preview">▶ 試聴</string>
+    <string name="stop">■ 停止</string>
+    <string name="volume_follow">音量：システムに従う</string>
+    <string name="volume_pct">音量 %1$d%%（アラームチャンネル、サイレント無視）</string>
+    <string name="delete">削除</string>
+    <string name="save">保存</string>
+    <string name="custom_selected">カスタムファイル（選択済み、下のボタンで変更）</string>
+    <string name="custom_unselected">カスタムファイル（選択後に有効）</string>
+
+    <string name="delete_title">プロファイル削除</string>
+    <string name="delete_msg">「%1$s」を削除しますか？\n（内蔵プロファイルは自動で復元されます）</string>
+    <string name="cancel">キャンセル</string>
+    <string name="deleted">削除しました</string>
+    <string name="save_failed">保存失敗：%1$s</string>
+    <string name="rule_preview">ルール：%1$s</string>
+    <string name="none_selected">時間帯が未選択です</string>
+    <string name="err_select_ring">先に着信音を選んでください</string>
+    <string name="err_custom_not_picked">カスタムファイルが未選択です</string>
+    <string name="err_at_least_one">1つ以上の時間帯を選んでください</string>
+
+    <string name="holiday">祝日</string>
+    <string name="workday">平日</string>
+    <string name="sunday">日曜日</string>
+    <string name="weekend">週末</string>
+
+    <string-array name="day_short">
+        <item>月</item><item>火</item><item>水</item><item>木</item><item>金</item><item>土</item><item>日</item>
+    </string-array>
+    <string-array name="day_full">
+        <item>月曜</item><item>火曜</item><item>水曜</item><item>木曜</item><item>金曜</item><item>土曜</item><item>日曜</item>
+    </string-array>
+
+    <string name="ring1_label">着信音1（通勤ベル）</string>
+    <string name="ring2_label">着信音2（平日・毎時）</string>
+    <string name="ring3_label">着信音3（平日・毎半時）</string>
+    <string name="ring4_label">着信音4（休日・毎時）</string>
+    <string name="ring5_label">着信音5（短い叮）</string>
+    <string name="ring6_label">着信音6（ダブルチャイム）</string>
+    <string name="ring7_label">着信音7（玄関チャイム）</string>
+    <string name="ring8_label">着信音8（家電の叮）</string>
+    <string name="ring_sys">システム通知音</string>
+
+    <string name="prof_node">特別・節目（最優先）</string>
+    <string name="prof_wd_hourly">平日・毎時</string>
+    <string name="prof_wd_half">平日・毎半時</string>
+    <string name="prof_weekend">特別・週末</string>
+</resources>

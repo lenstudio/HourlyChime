@@ -19,8 +19,13 @@ import org.json.JSONObject;
 
 public class MainActivity extends Activity {
 
-    private static final String[] DAY_NAMES = {"一", "二", "三", "四", "五", "六", "日"};
     private static final int[] DAY_VALUES = {2, 3, 4, 5, 6, 7, 1};
+    private String[] DAY_NAMES;
+
+    private String[] dayNames() {
+        if (DAY_NAMES == null) DAY_NAMES = getResources().getStringArray(R.array.day_short);
+        return DAY_NAMES;
+    }
 
     private LinearLayout list;
     private TextView bigTime, bigDate, stateLine, secTime, dayTag;
@@ -29,9 +34,10 @@ public class MainActivity extends Activity {
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
             if (secTime != null) secTime.setText(new SimpleDateFormat(
-                    "HH:mm:ss", Locale.CHINA).format(new Date()));
-            if (dayTag != null) dayTag.setText("今天：" + Scheduler.dayLabel(MainActivity.this,
-                    java.util.Calendar.getInstance()));
+                    "HH:mm:ss", Locale.getDefault()).format(new Date()));
+            if (dayTag != null) dayTag.setText(getString(R.string.today,
+                    Scheduler.dayLabel(MainActivity.this,
+                    java.util.Calendar.getInstance())));
             tick.postDelayed(this, 1000);
         }
     };
@@ -53,8 +59,8 @@ public class MainActivity extends Activity {
         hl.setOrientation(LinearLayout.VERTICAL);
         hl.setPadding(dp(8), 0, 0, 0);
         hl.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        hl.addView(Ui.text(this, "整点报时", 26, Ui.TEXT, true));
-        TextView sub = Ui.text(this, "Hourly Chime · 无常驻进程", 12, Ui.SUB, false);
+        hl.addView(Ui.text(this, getString(R.string.app_name), 26, Ui.TEXT, true));
+        TextView sub = Ui.text(this, getString(R.string.subtitle), 12, Ui.SUB, false);
         sub.setPadding(0, dp(4), 0, 0);
         hl.addView(sub);
         android.widget.ImageView logo = new android.widget.ImageView(this);
@@ -65,7 +71,7 @@ public class MainActivity extends Activity {
         header.addView(hl);
 
         android.widget.TextClock tcDate = new android.widget.TextClock(this);
-        tcDate.setFormat24Hour("MM月dd日 EEEE");
+        tcDate.setFormat24Hour(getString(R.string.date_clock));
         tcDate.setTextSize(11);
         tcDate.setTextColor(Ui.SUB);
         tcDate.setGravity(Gravity.END);
@@ -84,7 +90,7 @@ public class MainActivity extends Activity {
 
         // ── 状态主卡 ──
         LinearLayout hero = Ui.card(this, Ui.CARD, 22, 22);
-        hero.addView(Ui.label(this, "下 次 响 铃"));
+        hero.addView(Ui.label(this, getString(R.string.next_alarm)));
         bigTime = Ui.text(this, "—", 40, Ui.ACCENT, true);
         bigTime.setPadding(0, dp(6), 0, 0);
         hero.addView(bigTime);
@@ -99,7 +105,7 @@ public class MainActivity extends Activity {
         // ── 开关卡 ──
         LinearLayout ctrl = Ui.card(this, Ui.CARD, 18, 16);
         Switch en = new Switch(this);
-        en.setText("总开关");
+        en.setText(getString(R.string.master_switch));
         en.setTextSize(16);
         en.setTextColor(Ui.TEXT);
         en.setChecked(Scheduler.enabled(this));
@@ -111,7 +117,7 @@ public class MainActivity extends Activity {
         ctrl.addView(en);
         ctrl.addView(Ui.divider(this), sep(12));
         CheckBox vb = new CheckBox(this);
-        vb.setText("响铃同时振动");
+        vb.setText(getString(R.string.vibrate_together));
         vb.setTextSize(14);
         vb.setTextColor(Ui.TEXT);
         vb.setChecked(Scheduler.vibrate(this));
@@ -125,7 +131,7 @@ public class MainActivity extends Activity {
         View bar = new View(this);
         bar.setBackgroundColor(Ui.ACCENT);
         sec.addView(bar, new LinearLayout.LayoutParams(dp(4), dp(16)));
-        sec.addView(Ui.text(this, "  报时方案", 15, Ui.TEXT, true));
+        sec.addView(Ui.text(this, getString(R.string.section_profiles), 15, Ui.TEXT, true));
         root.addView(sec, Ui.mw(26, this));
 
         list = new LinearLayout(this);
@@ -133,7 +139,7 @@ public class MainActivity extends Activity {
         root.addView(list);
 
         Button add = new Button(this);
-        add.setText("＋ 新建方案");
+        add.setText(getString(R.string.new_profile));
         add.setAllCaps(false);
         add.setTextColor(Ui.ACCENT);
         add.setBackground(Ui.outline(Color.TRANSPARENT, Ui.ACCENT_DIM, 14, 1.5f, this));
@@ -164,19 +170,20 @@ public class MainActivity extends Activity {
             long at = Scheduler.nextTrigger(this);
             if (at > 0) {
                 Date d = new Date(at);
-                bigTime.setText(new SimpleDateFormat("HH:mm", Locale.CHINA).format(d));
-                bigDate.setText(new SimpleDateFormat("EEEE · MM月dd日", Locale.CHINA).format(d));
+                bigTime.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(d));
+                bigDate.setText(new SimpleDateFormat(getString(R.string.date_hero),
+                        Locale.getDefault()).format(d));
             } else {
                 bigTime.setText("—");
                 bigDate.setText("");
             }
-            stateLine.setText("运行中 · 零常驻，整点自动唤醒");
+            stateLine.setText(getString(R.string.state_running));
             stateLine.setTextColor(0xFF2E9E5B);
             bigTime.setTextColor(Ui.ACCENT);
         } else {
-            bigTime.setText("已关闭");
+            bigTime.setText(getString(R.string.state_off));
             bigTime.setTextColor(Ui.SUB);
-            bigDate.setText("打开总开关后恢复报时");
+            bigDate.setText(getString(R.string.state_off_hint));
             stateLine.setText("");
         }
 
@@ -200,7 +207,9 @@ public class MainActivity extends Activity {
             col.setOrientation(LinearLayout.VERTICAL);
             col.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
-            col.addView(Ui.text(this, (active ? "" : "⏸ ") + p.optString("name", "方案"), 16, Ui.TEXT, true));
+            col.addView(Ui.text(this, (active ? "" : "⏸ ") +
+                    (p.optString("name", "").isEmpty() ? getString(R.string.profile_default)
+                            : p.optString("name")), 16, Ui.TEXT, true));
             TextView det = Ui.text(this, describe(p), 12, Ui.SUB, false);
             det.setPadding(0, dp(4), 0, 0);
             col.addView(det);
@@ -220,15 +229,16 @@ public class MainActivity extends Activity {
     private String describe(JSONObject p) {
         StringBuilder sb = new StringBuilder();
         int m = p.optInt("dayMode", 0);
-        if (m == 1) sb.append("法定工作日  ");
-        else if (m == 2) sb.append("法定休息日  ");
+        if (m == 1) sb.append(getString(R.string.legal_workday)).append("  ");
+        else if (m == 2) sb.append(getString(R.string.legal_restday)).append("  ");
         JSONArray d = p.optJSONArray("days");
         if (m == 0) {
             if (d != null && d.length() > 0) {
+                String[] names = dayNames();
                 for (int j = 0; j < DAY_VALUES.length; j++)
                     for (int k = 0; k < d.length(); k++)
-                        if (d.optInt(k) == DAY_VALUES[j]) { sb.append(DAY_NAMES[j]); break; }
-            } else sb.append("每天");
+                        if (d.optInt(k) == DAY_VALUES[j]) { sb.append(names[j]); break; }
+            } else sb.append(getString(R.string.every_day));
         }
         JSONArray rules = p.optJSONArray("rules");
         if (rules != null) for (int k = 0; k < rules.length(); k++) sb.append("  ").append(rules.optString(k));

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hourly Chime</string>
+    <string name="subtitle">Hourly Chime · no persistent service</string>
+
+    <!-- Header / hero -->
+    <string name="date_clock">EEE, MMM dd</string>
+    <string name="date_hero">EEEE, MMM dd</string>
+    <string name="today">Today: %1$s</string>
+    <string name="next_alarm">NEXT ALARM</string>
+    <string name="state_running">Running · zero-persistent, wakes on the hour</string>
+    <string name="state_off">Off</string>
+    <string name="state_off_hint">Turn on the master switch to resume chimes</string>
+
+    <!-- Controls -->
+    <string name="master_switch">Master switch</string>
+    <string name="vibrate_together">Vibrate with ring</string>
+    <string name="section_profiles">  Chime profiles</string>
+    <string name="new_profile">＋ New profile</string>
+
+    <!-- Profile list -->
+    <string name="profile_default">Profile</string>
+    <string name="every_day">Every day</string>
+    <string name="legal_workday">Legal workdays</string>
+    <string name="legal_restday">Legal rest days</string>
+
+    <!-- Profile editor -->
+    <string name="create_profile">New profile</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="name_label">Name</string>
+    <string name="name_hint">Profile name</string>
+    <string name="effective_days">Active days</string>
+    <string name="mode_by_week">By weekday (check below)</string>
+    <string name="mode_legal_work">Legal workdays (holidays off, make-up days on)</string>
+    <string name="mode_legal_rest">Legal rest days (weekends + holidays)</string>
+    <string name="time_rules">Time rules (tick half-hour slots)</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="pick_audio">📂 Pick an audio file…</string>
+    <string name="preview">▶ Preview</string>
+    <string name="stop">■ Stop</string>
+    <string name="volume_follow">Volume: follow system</string>
+    <string name="volume_pct">Volume %1$d%% (alarm stream, ignores silent mode)</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="custom_selected">Custom file (selected, tap below to change)</string>
+    <string name="custom_unselected">Custom file (pick one to apply)</string>
+
+    <!-- Errors / dialogs -->
+    <string name="delete_title">Delete profile</string>
+    <string name="delete_msg">Delete \"%1$s\"?\n(Built-in profiles are restored automatically)</string>
+    <string name="cancel">Cancel</string>
+    <string name="deleted">Deleted</string>
+    <string name="save_failed">Save failed: %1$s</string>
+    <string name="rule_preview">Rules: %1$s</string>
+    <string name="none_selected">No time slot selected</string>
+    <string name="err_select_ring">Pick a ringtone first</string>
+    <string name="err_custom_not_picked">Custom file not chosen yet</string>
+    <string name="err_at_least_one">Select at least one time slot</string>
+
+    <!-- Day labels -->
+    <string name="holiday">Public holiday</string>
+    <string name="workday">Workday</string>
+    <string name="sunday">Sunday</string>
+    <string name="weekend">Weekend</string>
+
+    <!-- Day name arrays (Mon..Sun order, values 2..1) -->
+    <string-array name="day_short">
+        <item>Mon</item><item>Tue</item><item>Wed</item><item>Thu</item><item>Fri</item><item>Sat</item><item>Sun</item>
+    </string-array>
+    <string-array name="day_full">
+        <item>Mon</item><item>Tue</item><item>Wed</item><item>Thu</item><item>Fri</item><item>Sat</item><item>Sun</item>
+    </string-array>
+
+    <!-- Ringtones -->
+    <string name="ring1_label">Ringtone 1 (commute bell)</string>
+    <string name="ring2_label">Ringtone 2 (weekday hourly chime)</string>
+    <string name="ring3_label">Ringtone 3 (weekday half-hour chime)</string>
+    <string name="ring4_label">Ringtone 4 (rest-day hourly chime)</string>
+    <string name="ring5_label">Ringtone 5 (short ding)</string>
+    <string name="ring6_label">Ringtone 6 (double ding-dong)</string>
+    <string name="ring7_label">Ringtone 7 (doorbell)</string>
+    <string name="ring8_label">Ringtone 8 (appliance ding)</string>
+    <string name="ring_sys">System notification sound</string>
+
+    <!-- Default profile names -->
+    <string name="prof_node">Special – node (top priority)</string>
+    <string name="prof_wd_hourly">Weekday – hourly</string>
+    <string name="prof_wd_half">Weekday – half-hour</string>
+    <string name="prof_weekend">Special – weekend</string>
+</resources>

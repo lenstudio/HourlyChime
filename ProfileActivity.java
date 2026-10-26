@@ -25,11 +25,16 @@ import org.json.JSONObject;
 
 public class ProfileActivity extends Activity {
 
-    private static final String[] DAY_NAMES = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
     private static final int[] DAY_VALUES = {2, 3, 4, 5, 6, 7, 1};
-    private static final String[] RING_LABELS = {"Ringtone 1 (上下班提醒铃)", "Ringtone 2 (工作日正点报时)", "Ringtone 3 (工作日半点报时)", "Ringtone 4 (休息日整点报时)", "Ringtone 5 (短叮)", "Ringtone 6 (双音叮咚)", "Ringtone 7 (门铃叮咚)", "Ringtone 8 (家电叮)", "系统通知音"};
-    private static final String[] RING_VALUES = {"sing", "bell", "wind", "chimes", "d1", "d2", "d3", "d4", "sys"};
-    private static final String[] SRC_LABELS = {"App 内置铃声", "系统自带音效", "自选文件"};
+    private static final String[] RING_KEYS = {"sing", "bell", "wind", "chimes", "d1", "d2", "d3", "d4", "sys"};
+    private static final int[] RING_LABEL_IDS = {
+            R.string.ring1_label, R.string.ring2_label, R.string.ring3_label, R.string.ring4_label,
+            R.string.ring5_label, R.string.ring6_label, R.string.ring7_label, R.string.ring8_label,
+            R.string.ring_sys};
+
+    private String[] dayNames() {
+        return getResources().getStringArray(R.array.day_full);
+    }
 
     private EditText name;
     private final List<CheckBox> dayBoxes = new ArrayList<>();
@@ -65,19 +70,21 @@ public class ProfileActivity extends Activity {
         back.setPadding(dp(2), 0, dp(18), 0);
         back.setOnClickListener(v -> finish());
         head.addView(back);
-        head.addView(Ui.text(this, index < 0 ? "新建方案" : "编辑方案", 22, Ui.TEXT, true));
+        head.addView(Ui.text(this, index < 0 ? getString(R.string.create_profile)
+                : getString(R.string.edit_profile), 22, Ui.TEXT, true));
         root.addView(head);
 
         // 名称
-        root.addView(Ui.label(this, "名称"), Ui.mw(22, this));
+        root.addView(Ui.label(this, getString(R.string.name_label)), Ui.mw(22, this));
         name = input();
-        name.setHint("方案名称");
+        name.setHint(getString(R.string.name_hint));
         if (p != null) name.setText(p.optString("name", ""));
         root.addView(name, Ui.mw(8, this));
 
         // 生效日模式 + 星期
-        root.addView(Ui.label(this, "生效日"), Ui.mw(22, this));
-        String[] MODES = {"按星期（勾选下方）", "法定工作日（节假日自动休、调休自动上班）", "法定休息日（周末+节假日）"};
+        root.addView(Ui.label(this, getString(R.string.effective_days)), Ui.mw(22, this));
+        String[] MODES = {getString(R.string.mode_by_week), getString(R.string.mode_legal_work),
+                getString(R.string.mode_legal_rest)};
         LinearLayout modeCard = Ui.card(this, Ui.CARD, 14, 8);
         modeSpinner = new Spinner(this);
         modeSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, MODES));
@@ -90,9 +97,10 @@ public class ProfileActivity extends Activity {
         dh.setHorizontalScrollBarEnabled(false);
         LinearLayout days = new LinearLayout(this);
         JSONArray pd = p != null ? p.optJSONArray("days") : null;
+        String[] dayFull = dayNames();
         for (int i = 0; i < 7; i++) {
             CheckBox c = new CheckBox(this);
-            c.setText(DAY_NAMES[i]);
+            c.setText(dayFull[i]);
             c.setTextSize(13);
             c.setTextColor(Ui.TEXT);
             boolean checked = pd == null || pd.length() == 0;
@@ -115,7 +123,7 @@ public class ProfileActivity extends Activity {
         });
 
         // 时段规则：48 格半小时打勾网格
-        root.addView(Ui.label(this, "时段规则（每半小时一格打勾）"), Ui.mw(22, this));
+        root.addView(Ui.label(this, getString(R.string.time_rules)), Ui.mw(22, this));
         LinearLayout grid = new LinearLayout(this);
         for (int col = 0; col < 3; col++) {
             LinearLayout colBox = new LinearLayout(this);
@@ -138,15 +146,15 @@ public class ProfileActivity extends Activity {
         root.addView(rulePreview, Ui.mw(8, this));
 
         // 铃声：单一下拉（内置 + 系统音效 + 自定义）
-        root.addView(Ui.label(this, "铃声"), Ui.mw(22, this));
+        root.addView(Ui.label(this, getString(R.string.ringtone)), Ui.mw(22, this));
         LinearLayout ringCard = Ui.card(this, Ui.CARD, 14, 10);
         listSpinner = new Spinner(this);
         ringCard.addView(listSpinner);
-        fileBtn = ghostButton("📂 选择音频文件…");
+        fileBtn = ghostButton(getString(R.string.pick_audio));
         fileBtn.setOnClickListener(v -> pickFile());
         fileBtn.setVisibility(View.GONE);
         ringCard.addView(fileBtn, Ui.mw(6, this));
-        Button prev = ghostButton("▶ 试听");
+        Button prev = ghostButton(getString(R.string.preview));
         prev.setOnClickListener(vx -> togglePreview(prev));
         ringCard.addView(prev, Ui.mw(6, this));
         root.addView(ringCard, Ui.mw(8, this));
@@ -186,7 +194,7 @@ public class ProfileActivity extends Activity {
         LinearLayout actions = new LinearLayout(this);
         actions.setGravity(Gravity.CENTER_VERTICAL);
         delBtn = new Button(this);
-        delBtn.setText("删 除");
+        delBtn.setText(getString(R.string.delete));
         delBtn.setTextSize(15);
         delBtn.setTextColor(0xFFFFFFFF);
         delBtn.setBackground(Ui.fill(0xFFE5484D, 14, this));
@@ -196,7 +204,7 @@ public class ProfileActivity extends Activity {
         dlp.rightMargin = dp(12);
         actions.addView(delBtn, dlp);
         Button save = new Button(this);
-        save.setText("保 存");
+        save.setText(getString(R.string.save));
         save.setTextSize(16);
         save.setTextColor(Ui.ON_ACCENT);
         save.setBackground(Ui.fill(Ui.ACCENT, 14, this));
@@ -247,12 +255,14 @@ public class ProfileActivity extends Activity {
 
     private void updVol() {
         int pr = vol.getProgress();
-        volLabel.setText(pr == 0 ? "音量：跟随系统" : "音量 " + pr + "%（闹钟通道，不受静音限制）");
+        volLabel.setText(pr == 0 ? getString(R.string.volume_follow)
+                : getString(R.string.volume_pct, pr));
     }
 
     private void updPreview() {
         List<String> rs = genRules();
-        rulePreview.setText(rs.isEmpty() ? "未勾选任何时段" : "规则：" + String.join(",", rs));
+        rulePreview.setText(rs.isEmpty() ? getString(R.string.none_selected)
+                : getString(R.string.rule_preview, String.join(",", rs)));
     }
 
     /** 勾选状态 -> 规则串：连续半点合并 /30，整点对齐合并默认步长，:30 对齐合并 /60 */
@@ -296,8 +306,10 @@ public class ProfileActivity extends Activity {
     private void rebuildList() {
         listLabels.clear();
         listValues.clear();
-        for (String s : RING_LABELS) listLabels.add(s);
-        for (String s : RING_VALUES) listValues.add(s);
+        for (int i = 0; i < RING_KEYS.length; i++) {
+            listLabels.add(getString(RING_LABEL_IDS[i]));
+            listValues.add(RING_KEYS[i]);
+        }
         try {
             android.media.RingtoneManager rm = new android.media.RingtoneManager(this);
             rm.setType(android.media.RingtoneManager.TYPE_NOTIFICATION
@@ -314,10 +326,10 @@ public class ProfileActivity extends Activity {
             }
         } catch (Exception ignored) { }
         if (customUri != null) {
-            listLabels.add("自定义文件（已选，点下方按钮更换）");
+            listLabels.add(getString(R.string.custom_selected));
             listValues.add("doc:" + customUri);
         } else {
-            listLabels.add("自定义文件（选择后生效）");
+            listLabels.add(getString(R.string.custom_unselected));
             listValues.add("custom");
         }
         listSpinner.setAdapter(new ArrayAdapter<>(this,
@@ -351,9 +363,9 @@ public class ProfileActivity extends Activity {
     /** 当前铃声选择的 ring 值：内置 key / sys:URI / doc:URI */
     private String currentRingValue() throws Exception {
         int pos = listSpinner.getSelectedItemPosition();
-        if (pos < 0 || pos >= listValues.size()) throw new Exception("请先选择铃声");
+        if (pos < 0 || pos >= listValues.size()) throw new Exception(getString(R.string.err_select_ring));
         String v = listValues.get(pos);
-        if (v.isEmpty() || "custom".equals(v)) throw new Exception("自定义文件还未选择");
+        if (v.isEmpty() || "custom".equals(v)) throw new Exception(getString(R.string.err_custom_not_picked));
         return v;
     }
 
@@ -400,7 +412,7 @@ public class ProfileActivity extends Activity {
             preview.prepare();
             preview.setOnCompletionListener(m -> stopPreview(btn));
             preview.start();
-            btn.setText("■ 停止");
+            btn.setText(getString(R.string.stop));
         } catch (Exception e) {
             stopPreview(btn);
         }
@@ -413,7 +425,7 @@ public class ProfileActivity extends Activity {
             am.setStreamVolume(AudioManager.STREAM_ALARM, pvSave, 0);
             pvSave = -1;
         }
-        btn.setText("▶ 试听");
+        btn.setText(getString(R.string.preview));
     }
 
     @Override
@@ -432,16 +444,16 @@ public class ProfileActivity extends Activity {
 
     private void delConfirm() {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("删除方案")
-                .setMessage("确定删除「" + name.getText().toString().trim() + "」吗？\n（预置方案删除后会自动补回）")
-                .setNegativeButton("取消", null)
-                .setPositiveButton("删除", (d, w) -> {
+                .setTitle(getString(R.string.delete_title))
+                .setMessage(getString(R.string.delete_msg, name.getText().toString().trim()))
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setPositiveButton(getString(R.string.delete), (d, w) -> {
                     JSONArray arr = Scheduler.profiles(this);
                     JSONArray out = new JSONArray();
                     for (int k = 0; k < arr.length(); k++) if (k != index) out.put(arr.optJSONObject(k));
                     Scheduler.saveProfiles(this, out);
                     ChimeReceiver.scheduleNext(this);
-                    Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.deleted), Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .show();
@@ -453,14 +465,14 @@ public class ProfileActivity extends Activity {
         try {
             JSONObject p = new JSONObject();
             p.put("name", name.getText().toString().trim());
-            if (p.optString("name").isEmpty()) p.put("name", "方案");
+            if (p.optString("name").isEmpty()) p.put("name", getString(R.string.profile_default));
             JSONArray days = new JSONArray();
             for (int i = 0; i < 7; i++) if (dayBoxes.get(i).isChecked()) days.put(DAY_VALUES[i]);
             if (days.length() == 0) for (int v2 : DAY_VALUES) days.put(v2);
             p.put("days", days);
             p.put("dayMode", modeSpinner.getSelectedItemPosition());
             List<String> rs = genRules();
-            if (rs.isEmpty()) throw new IllegalArgumentException("至少勾选一个时段");
+            if (rs.isEmpty()) throw new IllegalArgumentException(getString(R.string.err_at_least_one));
             JSONArray rules = new JSONArray();
             for (String r : rs) {
                 Scheduler.expandRule(r); // 校验
@@ -477,7 +489,7 @@ public class ProfileActivity extends Activity {
             ChimeReceiver.scheduleNext(this);
             finish();
         } catch (Exception ex) {
-            Toast.makeText(this, "保存失败：" + ex.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.save_failed, ex.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
 
