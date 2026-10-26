@@ -60,16 +60,20 @@ public class ChimeReceiver extends BroadcastReceiver {
             AudioManager am = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
             int vol = p.optInt("vol", 80);
             savedVol = -1;
+            float gain = 1f;
             if (vol >= 0) {
+                // 双保险：闹铃流尽量拉满 + MediaPlayer 按百分比精确衰减
+                // （部分系统/勿扰场景会拒绝 setStreamVolume，仅靠它音量会不准）
                 int max = am.getStreamMaxVolume(AudioManager.STREAM_ALARM);
                 savedVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
-                am.setStreamVolume(AudioManager.STREAM_ALARM,
-                        Math.max(1, Math.round(vol / 100f * max)), 0);
+                am.setStreamVolume(AudioManager.STREAM_ALARM, max, 0);
+                gain = Math.max(0f, Math.min(1f, vol / 100f));
             }
             mp = new MediaPlayer();
             mp.setAudioAttributes(new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+            mp.setVolume(gain, gain);
             String ring = p.optString("ring", "bell");
             if (ring.startsWith("sys:") || ring.startsWith("doc:")) {
                 // 系统音效或自选文件：ring 值内嵌 URI

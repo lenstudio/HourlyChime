@@ -395,12 +395,17 @@ public class ProfileActivity extends Activity {
                     ? Math.round(am.getStreamVolume(AudioManager.STREAM_ALARM) * 100f / max)
                     : vol.getProgress();
             pvSave = am.getStreamVolume(AudioManager.STREAM_ALARM);
-            am.setStreamVolume(AudioManager.STREAM_ALARM,
-                    Math.max(1, Math.round(pct / 100f * max)), 0);
+            float gain = 1f;
+            if (vol.getProgress() != 0) {
+                // 双保险：流拉满 + MediaPlayer 百分比衰减（见 ChimeReceiver）
+                am.setStreamVolume(AudioManager.STREAM_ALARM, max, 0);
+                gain = Math.max(0f, Math.min(1f, pct / 100f));
+            }
             preview = new MediaPlayer();
             preview.setAudioAttributes(new android.media.AudioAttributes.Builder()
                     .setUsage(android.media.AudioAttributes.USAGE_ALARM)
                     .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+            preview.setVolume(gain, gain);
             String rv = currentRingValue();
             if (rv.startsWith("sys:") || rv.startsWith("doc:")) {
                 preview.setDataSource(this, Uri.parse(rv.substring(4)));
