@@ -82,4 +82,5 @@
     <string name="conflict_intro">Estas horas coinciden con otros perfiles activos:</string>
     <string name="conflict_ask">Guardar igualmente</string>
     <string name="save_anyway">Guardar igualmente</string>
+    <string name="hint_drag">Mantén pulsado y arrastra para priorizar</string>
 </resources>

@@ -91,4 +91,5 @@
     <string name="conflict_intro">These times overlap other enabled profiles:</string>
     <string name="conflict_ask">Save anyway</string>
     <string name="save_anyway">Save anyway</string>
+    <string name="hint_drag">Long-press and drag to set priority</string>
 </resources>

@@ -1,9 +1,11 @@
 package com.len.hourlychime;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -49,7 +51,6 @@ public class MainActivity extends Activity {
         int pad = Ui.dpi(20, this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackground(Ui.screenBg(this));
         root.setPadding(pad, Ui.statusBarHeight(this) + dp(12), pad, dp(24));
 
         // ── Header：标题居左，当前时间日期居右（TextClock 自动刷新）──
@@ -132,11 +133,18 @@ public class MainActivity extends Activity {
         bar.setBackgroundColor(Ui.ACCENT);
         sec.addView(bar, new LinearLayout.LayoutParams(dp(4), dp(16)));
         sec.addView(Ui.text(this, getString(R.string.section_profiles), 15, Ui.TEXT, true));
-        root.addView(sec, Ui.mw(26, this));
+        View hint = Ui.text(this, getString(R.string.hint_drag), 10, Ui.SUB, false);
+        hint.setPadding(dp(8), dp(2), 0, 0);
+        LinearLayout sh = new LinearLayout(this);
+        sh.setOrientation(LinearLayout.VERTICAL);
+        sh.addView(sec);
+        sh.addView(hint);
+        root.addView(sh, Ui.mw(26, this));
 
         list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
         root.addView(list);
+        list.setOnDragListener(dragReorder());
 
         Button add = new Button(this);
         add.setText(getString(R.string.new_profile));
@@ -146,7 +154,15 @@ public class MainActivity extends Activity {
         add.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
         root.addView(add, Ui.mw(12, this));
 
-        setContentView(new android.widget.ScrollView(this) {{ addView(root); }});
+        // 底图固定层：bg 不随内容滚动
+        android.widget.FrameLayout fl = new android.widget.FrameLayout(this);
+        fl.setBackground(Ui.screenBg(this));
+        android.widget.ScrollView sv = new android.widget.ScrollView(this);
+        sv.addView(root);
+        fl.addView(sv, new android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(fl);
         refresh();
     }
 
@@ -222,6 +238,12 @@ public class MainActivity extends Activity {
                 it.putExtra("index", idx);
                 startActivity(it);
             });
+            card.setTag(idx);
+            card.setOnLongClickListener(v -> {
+                v.startDragAndDrop(ClipData.newPlainText("idx", String.valueOf(idx)),
+                        new android.view.View.DragShadowBuilder(v), idx, 0);
+                return true;
+            });
             list.addView(card, Ui.mw(10, this));
         }
     }
@@ -243,6 +265,68 @@ public class MainActivity extends Activity {
         JSONArray rules = p.optJSONArray("rules");
         if (rules != null) for (int k = 0; k < rules.length(); k++) sb.append("  ").append(rules.optString(k));
         return sb.toString();
+    }
+
+    /** 拖动排序：长按卡片拖到目标位置，松手即持久化（数组顺序 = 触发优先级） */
+    private android.view.View.OnDragListener dragReorder() {
+        return (v, ev) -> {
+            switch (ev.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    return ev.getLocalState() instanceof Integer;
+                case DragEvent.ACTION_DRAG_LOCATION: {
+                    int dragIdx = (Integer) ev.getLocalState();
+                    View dragged = childWithTag(dragIdx);
+                    if (dragged == null) return true;
+                    float y = ev.getY();
+                    int counter = 0, target = counter, cur = list.indexOfChild(dragged);
+                    boolean placed = false;
+                    for (int i = 0; i < list.getChildCount(); i++) {
+                        View ch = list.getChildAt(i);
+                        if ((Integer) ch.getTag() == dragIdx) continue;
+                        if (!placed && y < ch.getY() + ch.getHeight() / 2f) {
+                            target = counter;
+                            placed = true;
+                        }
+                        counter++;
+                    }
+                    if (!placed) target = counter;
+                    if (target != cur) {
+                        list.removeView(dragged);
+                        list.addView(dragged, Math.min(target, list.getChildCount()));
+                        list.requestLayout();
+                    }
+                    return true;
+                }
+                case DragEvent.ACTION_DROP:
+                case DragEvent.ACTION_DRAG_ENDED:
+                    persistOrder();
+                    return true;
+                default:
+                    return true;
+            }
+        };
+    }
+
+    private View childWithTag(int tag) {
+        for (int i = 0; i < list.getChildCount(); i++) {
+            View ch = list.getChildAt(i);
+            if (ch.getTag() instanceof Integer && (Integer) ch.getTag() == tag) return ch;
+        }
+        return null;
+    }
+
+    /** 按当前卡片顺序重排 profiles 数组并保存 */
+    private void persistOrder() {
+        JSONArray ps = Scheduler.profiles(this);
+        JSONArray out = new JSONArray();
+        for (int i = 0; i < list.getChildCount(); i++) {
+            Integer tag = (Integer) list.getChildAt(i).getTag();
+            if (tag != null && tag >= 0 && tag < ps.length()) out.put(ps.optJSONObject(tag));
+        }
+        if (out.length() != ps.length()) return;
+        Scheduler.saveProfiles(this, out);
+        ChimeReceiver.scheduleNext(this);
+        refresh();
     }
 
     private LinearLayout.LayoutParams sep(int top) {

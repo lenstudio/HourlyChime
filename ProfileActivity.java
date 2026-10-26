@@ -60,7 +60,6 @@ public class ProfileActivity extends Activity {
         int pad = Ui.dpi(20, this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackground(Ui.screenBg(this));
         root.setPadding(pad, Ui.statusBarHeight(this) + dp(12), pad, dp(24));
 
         // 返回 + 标题：左上角小箭头
@@ -215,7 +214,15 @@ public class ProfileActivity extends Activity {
         ap.leftMargin = 0;
         root.addView(actions, ap);
 
-        setContentView(new android.widget.ScrollView(this) {{ addView(root); }});
+        // 底图固定层：bg 不随内容滚动
+        android.widget.FrameLayout fl = new android.widget.FrameLayout(this);
+        fl.setBackground(Ui.screenBg(this));
+        android.widget.ScrollView sv = new android.widget.ScrollView(this);
+        sv.addView(root);
+        fl.addView(sv, new android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(fl);
 
         // 载入已有规则 -> 点亮对应格子
         JSONArray pr = p != null ? p.optJSONArray("rules") : null;
