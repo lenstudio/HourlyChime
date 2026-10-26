@@ -230,4 +230,74 @@ public class Scheduler {
         }
         return null;
     }
+
+    // ── 方案时间冲突检测 ──
+
+    /** 日期串 yyyy-MM-dd -> Calendar 星期值（1=周日 ... 7=周六） */
+    private static int dowOf(String date) {
+        try {
+            java.text.SimpleDateFormat f =
+                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+            Calendar d = Calendar.getInstance();
+            d.setTime(f.parse(date));
+            return d.get(Calendar.DAY_OF_WEEK);
+        } catch (Exception e) { return -1; }
+    }
+
+    /** 方案覆盖的星期集合（Calendar.DAY_OF_WEEK 值）：mode1 工作日=周一至五+补班日，mode2=周末+假日 */
+    public static java.util.HashSet<Integer> daySet(Context c, JSONObject p) {
+        java.util.HashSet<Integer> s = new java.util.HashSet<>();
+        int mode = p.optInt("dayMode", 0);
+        if (mode == 0) {
+            JSONArray d = p.optJSONArray("days");
+            if (d == null || d.length() == 0) { for (int v = 1; v <= 7; v++) s.add(v); }
+            else for (int i = 0; i < d.length(); i++) s.add(d.optInt(i, -1));
+            return s;
+        }
+        loadCal(c);
+        if (mode == 1) {
+            for (int v = Calendar.MONDAY; v <= Calendar.FRIDAY; v++) s.add(v);
+            if (WORK != null) for (String w : WORK) s.add(dowOf(w));
+        } else {
+            s.add(Calendar.SATURDAY);
+            s.add(Calendar.SUNDAY);
+            if (HOLI != null) for (String h : HOLI) s.add(dowOf(h));
+        }
+        return s;
+    }
+
+    /** 候选方案的触发分钟集合 */
+    private static TreeSet<Integer> minutesOf(JSONObject p) {
+        TreeSet<Integer> set = new TreeSet<>();
+        for (String rule : rules(p)) {
+            try { set.addAll(expandRule(rule)); } catch (Exception ignored) { }
+        }
+        return set;
+    }
+
+    /** 候选方案与其它启用方案（排除 excludeIndex）的时间冲突列表，格式 "H:MM（方案名）"，升序去重 */
+    public static List<String> conflicts(Context c, JSONObject candidate, int excludeIndex) {
+        TreeSet<Integer> candMin = minutesOf(candidate);
+        if (candMin.isEmpty()) return new ArrayList<>();
+        java.util.HashSet<Integer> candDays = daySet(c, candidate);
+        TreeSet<String> out = new TreeSet<>();
+        JSONArray ps = profiles(c);
+        for (int i = 0; i < ps.length(); i++) {
+            if (i == excludeIndex) continue;
+            JSONObject o = ps.optJSONObject(i);
+            if (o == null || !o.optBoolean("on", true)) continue;
+            boolean overlap = false;
+            for (int v : daySet(c, o)) if (candDays.contains(v)) { overlap = true; break; }
+            if (!overlap) continue;
+            TreeSet<Integer> otherMin = minutesOf(o);
+            String name = o.optString("name", "?");
+            for (Integer m : candMin) {
+                if (otherMin.contains(m)) {
+                    out.add(String.format(java.util.Locale.US, "%d:%02d（%s）",
+                            m / 60, m % 60, name));
+                }
+            }
+        }
+        return new ArrayList<>(out);
+    }
 }

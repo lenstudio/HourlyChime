@@ -78,4 +78,8 @@
     <string name="prof_wd_hourly">工作日-整点</string>
     <string name="prof_wd_half">工作日-半点</string>
     <string name="prof_weekend">特铃-周末</string>
+    <string name="conflict_title">时间冲突</string>
+    <string name="conflict_intro">以下时间与其它启用方案重叠：</string>
+    <string name="conflict_ask">仍要保存</string>
+    <string name="save_anyway">仍要保存</string>
 </resources>

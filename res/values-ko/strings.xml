@@ -78,4 +78,8 @@
     <string name="prof_wd_hourly">평일 – 정각</string>
     <string name="prof_wd_half">평일 – 30분</string>
     <string name="prof_weekend">특별 – 주말</string>
+    <string name="conflict_title">시간 충돌</string>
+    <string name="conflict_intro">다음 시간이 다른 활성 프로필과 겹칩니다:</string>
+    <string name="conflict_ask">그래도 저장</string>
+    <string name="save_anyway">그래도 저장</string>
 </resources>

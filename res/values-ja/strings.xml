@@ -78,4 +78,8 @@
     <string name="prof_wd_hourly">平日・毎時</string>
     <string name="prof_wd_half">平日・毎半時</string>
     <string name="prof_weekend">特別・週末</string>
+    <string name="conflict_title">時間の重複</string>
+    <string name="conflict_intro">以下の時間は他の有効なプロファイルと重複しています：</string>
+    <string name="conflict_ask">それでも保存</string>
+    <string name="save_anyway">それでも保存</string>
 </resources>

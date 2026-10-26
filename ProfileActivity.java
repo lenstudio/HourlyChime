@@ -463,26 +463,49 @@ public class ProfileActivity extends Activity {
 
     private void save() {
         try {
-            JSONObject p = new JSONObject();
-            p.put("name", name.getText().toString().trim());
-            if (p.optString("name").isEmpty()) p.put("name", getString(R.string.profile_default));
-            JSONArray days = new JSONArray();
-            for (int i = 0; i < 7; i++) if (dayBoxes.get(i).isChecked()) days.put(DAY_VALUES[i]);
-            if (days.length() == 0) for (int v2 : DAY_VALUES) days.put(v2);
-            p.put("days", days);
-            p.put("dayMode", modeSpinner.getSelectedItemPosition());
-            List<String> rs = genRules();
-            if (rs.isEmpty()) throw new IllegalArgumentException(getString(R.string.err_at_least_one));
-            JSONArray rules = new JSONArray();
-            for (String r : rs) {
-                Scheduler.expandRule(r); // 校验
-                rules.put(r);
-            }
-            p.put("rules", rules);
-            p.put("ring", currentRingValue());
-            p.put("vol", vol.getProgress() == 0 ? -1 : vol.getProgress());
-            p.put("on", true);
+            JSONObject p = buildProfile();
+            List<String> conflicts = Scheduler.conflicts(this, p, index);
+            if (conflicts.isEmpty()) { doSave(p); return; }
+            StringBuilder msg = new StringBuilder(getString(R.string.conflict_intro));
+            for (String s : conflicts) msg.append("\n· ").append(s);
+            msg.append('\n').append(getString(R.string.conflict_ask));
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.conflict_title))
+                    .setMessage(msg)
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .setPositiveButton(getString(R.string.save_anyway), (d, w) -> doSave(p))
+                    .show();
+        } catch (Exception ex) {
+            Toast.makeText(this, getString(R.string.save_failed, ex.getMessage()), Toast.LENGTH_LONG).show();
+        }
+    }
 
+    /** 校验并组装方案 JSON（不含写入） */
+    private JSONObject buildProfile() throws Exception {
+        JSONObject p = new JSONObject();
+        p.put("name", name.getText().toString().trim());
+        if (p.optString("name").isEmpty()) p.put("name", getString(R.string.profile_default));
+        JSONArray days = new JSONArray();
+        for (int i = 0; i < 7; i++) if (dayBoxes.get(i).isChecked()) days.put(DAY_VALUES[i]);
+        if (days.length() == 0) for (int v2 : DAY_VALUES) days.put(v2);
+        p.put("days", days);
+        p.put("dayMode", modeSpinner.getSelectedItemPosition());
+        List<String> rs = genRules();
+        if (rs.isEmpty()) throw new IllegalArgumentException(getString(R.string.err_at_least_one));
+        JSONArray rules = new JSONArray();
+        for (String r : rs) {
+            Scheduler.expandRule(r); // 校验
+            rules.put(r);
+        }
+        p.put("rules", rules);
+        p.put("ring", currentRingValue());
+        p.put("vol", vol.getProgress() == 0 ? -1 : vol.getProgress());
+        p.put("on", true);
+        return p;
+    }
+
+    private void doSave(JSONObject p) {
+        try {
             JSONArray arr = Scheduler.profiles(this);
             if (index >= 0) arr.put(index, p); else arr.put(p);
             Scheduler.saveProfiles(this, arr);

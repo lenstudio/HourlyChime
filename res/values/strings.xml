@@ -87,4 +87,8 @@
     <string name="prof_wd_hourly">Weekday – hourly</string>
     <string name="prof_wd_half">Weekday – half-hour</string>
     <string name="prof_weekend">Special – weekend</string>
+    <string name="conflict_title">Time conflicts</string>
+    <string name="conflict_intro">These times overlap other enabled profiles:</string>
+    <string name="conflict_ask">Save anyway</string>
+    <string name="save_anyway">Save anyway</string>
 </resources>
