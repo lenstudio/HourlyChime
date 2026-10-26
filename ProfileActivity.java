@@ -25,6 +25,11 @@ import org.json.JSONObject;
 
 public class ProfileActivity extends Activity {
 
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(Lang.wrap(base));
+    }
+
     private static final int[] DAY_VALUES = {2, 3, 4, 5, 6, 7, 1};
     private static final String[] RING_KEYS = {"sing", "bell", "wind", "chimes", "d1", "d2", "d3", "d4", "sys"};
     private static final int[] RING_LABEL_IDS = {

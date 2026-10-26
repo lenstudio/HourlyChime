@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -20,6 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(Lang.wrap(base));
+    }
 
     private static final int[] DAY_VALUES = {2, 3, 4, 5, 6, 7, 1};
     private String[] DAY_NAMES;
@@ -61,9 +67,11 @@ public class MainActivity extends Activity {
         hl.setPadding(dp(8), 0, 0, 0);
         hl.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         hl.addView(Ui.text(this, getString(R.string.app_name), 26, Ui.TEXT, true));
-        TextView sub = Ui.text(this, getString(R.string.subtitle), 12, Ui.SUB, false);
-        sub.setPadding(0, dp(4), 0, 0);
-        hl.addView(sub);
+        LinearLayout langRow = new LinearLayout(this);
+        langRow.setPadding(0, dp(6), 0, 0);
+        langRow.addView(langChip("EN", "en"));
+        langRow.addView(langChip("中文", "zh"));
+        hl.addView(langRow);
         android.widget.ImageView logo = new android.widget.ImageView(this);
         try {
             logo.setImageBitmap(android.graphics.BitmapFactory.decodeStream(getAssets().open("icon.png")));
@@ -178,6 +186,29 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         tick.removeCallbacks(ticker);   // 页面不可见即停，不常驻
+    }
+
+    /** 语言切换小胶囊：当前语言高亮，点击切换并重建页面 */
+    private TextView langChip(String label, final String code) {
+        final boolean active = Lang.pref(this).equals(code);
+        TextView t = new TextView(this);
+        t.setText(label);
+        t.setTextSize(11);
+        t.setTypeface(active ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+        t.setTextColor(active ? Ui.ON_ACCENT : Ui.SUB);
+        t.setBackground(Ui.fill(active ? Ui.ACCENT : Ui.CARD2, 10, this));
+        t.setPadding(dp(10), dp(3), dp(10), dp(3));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.rightMargin = dp(6);
+        t.setLayoutParams(lp);
+        t.setOnClickListener(v -> {
+            if (!Lang.pref(this).equals(code)) {
+                Lang.set(this, code);
+                recreate();
+            }
+        });
+        return t;
     }
 
     private void refresh() {
