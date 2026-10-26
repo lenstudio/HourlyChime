@@ -83,10 +83,10 @@
     <string name="ring_sys">System notification sound</string>
 
     <!-- Default profile names -->
-    <string name="prof_node">Special – node (top priority)</string>
+    <string name="prof_node">Workday – commute</string>
     <string name="prof_wd_hourly">Weekday – hourly</string>
     <string name="prof_wd_half">Weekday – half-hour</string>
-    <string name="prof_weekend">Special – weekend</string>
+    <string name="prof_weekend">Holiday chime</string>
     <string name="conflict_title">Time conflicts</string>
     <string name="conflict_intro">These times overlap other enabled profiles:</string>
     <string name="conflict_ask">Save anyway</string>

@@ -74,10 +74,10 @@
     <string name="ring8_label">Tono 8 (ding de electrodoméstico)</string>
     <string name="ring_sys">Sonido del sistema</string>
 
-    <string name="prof_node">Especial – nodos (prioridad alta)</string>
+    <string name="prof_node">Laborable – entrada/salida</string>
     <string name="prof_wd_hourly">Laborable – en punto</string>
     <string name="prof_wd_half">Laborable – media hora</string>
-    <string name="prof_weekend">Especial – fin de semana</string>
+    <string name="prof_weekend">Días festivos</string>
     <string name="conflict_title">Conflicto de horarios</string>
     <string name="conflict_intro">Estas horas coinciden con otros perfiles activos:</string>
     <string name="conflict_ask">Guardar igualmente</string>
