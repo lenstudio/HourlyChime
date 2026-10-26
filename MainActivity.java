@@ -190,7 +190,10 @@ public class MainActivity extends Activity {
             Scheduler.setGlobalVolOn(MainActivity.this, ck);
             updGlobalVol(gsw, gvol, gvolLabel);
         });
-        gvCard.addView(gvol, sep(10));
+        LinearLayout.LayoutParams glp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        glp.topMargin = dp(10);
+        gvCard.addView(gvol, glp);
         gvolLabel.setPadding(0, dp(4), 0, 0);
         gvCard.addView(gvolLabel);
         root.addView(gvCard, Ui.mw(12, this));
