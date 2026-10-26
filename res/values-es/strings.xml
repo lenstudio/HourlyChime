@@ -83,4 +83,8 @@
     <string name="conflict_ask">Guardar igualmente</string>
     <string name="save_anyway">Guardar igualmente</string>
     <string name="hint_drag">Mantén pulsado y arrastra para priorizar</string>
+    <string name="global_vol">Volumen global (anula todos los perfiles)</string>
+    <string name="global_vol_pct">Volumen %1$d%% (todos los perfiles, canal de alarma)</string>
+    <string name="global_vol_hint">Desactivado: cada perfil usa su propio volumen</string>
+    <string name="vol_overridden">Anulado por el volumen global (%1$d%%)</string>
 </resources>

@@ -58,7 +58,7 @@ public class ChimeReceiver extends BroadcastReceiver {
         try {
             if (mp != null) { mp.release(); mp = null; }
             AudioManager am = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
-            int vol = p.optInt("vol", 80);
+            int vol = Scheduler.effectiveVol(ctx, p);   // 全局覆盖优先，其次方案自身（-1=跟随系统）
             savedVol = -1;
             float gain = 1f;
             if (vol >= 0) {
@@ -73,7 +73,8 @@ public class ChimeReceiver extends BroadcastReceiver {
             mp.setAudioAttributes(new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
-            mp.setVolume(gain, gain);
+            // 注意：setVolume 必须在 prepare 之后调用——Idle 态调用会被系统静默忽略（增益失效=全音量）
+            final float g = gain;
             String ring = p.optString("ring", "bell");
             if (ring.startsWith("sys:") || ring.startsWith("doc:")) {
                 // 系统音效或自选文件：ring 值内嵌 URI
@@ -96,6 +97,7 @@ public class ChimeReceiver extends BroadcastReceiver {
                 fd.close();
             }
             mp.prepare();
+            mp.setVolume(g, g);
             final Context app = ctx.getApplicationContext();
             mp.setOnCompletionListener(m -> {
                 m.release();
@@ -109,6 +111,7 @@ public class ChimeReceiver extends BroadcastReceiver {
                 pr.finish();
             });
             mp.start();
+            mp.setVolume(g, g);   // 个别系统 start 时会重置增益，补一次保险
         } catch (Exception e) {
             // 播放失败也要排下一次并释放
             scheduleNext(ctx);

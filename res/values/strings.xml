@@ -92,4 +92,8 @@
     <string name="conflict_ask">Save anyway</string>
     <string name="save_anyway">Save anyway</string>
     <string name="hint_drag">Long-press and drag to set priority</string>
+    <string name="global_vol">Global volume (overrides all profiles)</string>
+    <string name="global_vol_pct">Volume %1$d%% (all profiles, alarm stream)</string>
+    <string name="global_vol_hint">When off, each profile uses its own volume</string>
+    <string name="vol_overridden">Overridden by global volume (%1$d%%)</string>
 </resources>

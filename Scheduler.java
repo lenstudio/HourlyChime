@@ -21,6 +21,18 @@ public class Scheduler {
     public static boolean vibrate(Context c) { return sp(c).getBoolean("vibrate", true); }
     public static void setVibrate(Context c, boolean v) { sp(c).edit().putBoolean("vibrate", v).apply(); }
 
+    // ── 全局音量（一键覆盖所有方案）──
+    public static boolean globalVolOn(Context c) { return sp(c).getBoolean("globalVolOn", false); }
+    public static void setGlobalVolOn(Context c, boolean v) { sp(c).edit().putBoolean("globalVolOn", v).apply(); }
+    public static int globalVol(Context c) { return Math.max(0, Math.min(100, sp(c).getInt("globalVol", 80))); }
+    public static void setGlobalVol(Context c, int v) { sp(c).edit().putInt("globalVol", Math.max(0, Math.min(100, v))).apply(); }
+
+    /** 实际播放音量：全局覆盖开启→全局值（0-100）；否则方案自身值（-1=跟随系统） */
+    public static int effectiveVol(Context c, JSONObject p) {
+        if (globalVolOn(c)) return globalVol(c);
+        return p == null ? -1 : p.optInt("vol", -1);
+    }
+
     public static JSONArray profiles(Context c) {
         SharedPreferences s = sp(c);
         if (!s.getBoolean("seed_v5", false)) {   // v5：接入法定工作日/休息日智能同步

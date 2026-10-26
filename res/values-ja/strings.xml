@@ -83,4 +83,8 @@
     <string name="conflict_ask">それでも保存</string>
     <string name="save_anyway">それでも保存</string>
     <string name="hint_drag">長押しでドラッグし優先度を変更</string>
+    <string name="global_vol">グローバル音量（全プロファイルに適用）</string>
+    <string name="global_vol_pct">音量 %1$d%%（全プロファイル、アラームチャンネル）</string>
+    <string name="global_vol_hint">オフ時は各プロファイルの音量を使用</string>
+    <string name="vol_overridden">グローバル音量で上書き中（%1$d%%）</string>
 </resources>

@@ -266,6 +266,14 @@ public class ProfileActivity extends Activity {
     private static int ColorTransparent() { return 0x00000000; }
 
     private void updVol() {
+        if (Scheduler.globalVolOn(this)) {   // 全局覆盖开启：方案自身音量暂不生效
+            vol.setEnabled(false);
+            vol.setAlpha(0.4f);
+            volLabel.setText(getString(R.string.vol_overridden, Scheduler.globalVol(this)));
+            return;
+        }
+        vol.setEnabled(true);
+        vol.setAlpha(1f);
         int pr = vol.getProgress();
         volLabel.setText(pr == 0 ? getString(R.string.volume_follow)
                 : getString(R.string.volume_pct, pr));
@@ -396,16 +404,18 @@ public class ProfileActivity extends Activity {
                     : vol.getProgress();
             pvSave = am.getStreamVolume(AudioManager.STREAM_ALARM);
             float gain = 1f;
-            if (vol.getProgress() != 0) {
-                // 双保险：流拉满 + MediaPlayer 百分比衰减（见 ChimeReceiver）
+            int eff = Scheduler.globalVolOn(this) ? Scheduler.globalVol(this)
+                    : (vol.getProgress() != 0 ? pct : -1);
+            if (eff >= 0) {
+                // 双保险：流拉满 + MediaPlayer 百分比衰减（见 ChimeReceiver）；全局覆盖优先
                 am.setStreamVolume(AudioManager.STREAM_ALARM, max, 0);
-                gain = Math.max(0f, Math.min(1f, pct / 100f));
+                gain = Math.max(0f, Math.min(1f, eff / 100f));
             }
             preview = new MediaPlayer();
             preview.setAudioAttributes(new android.media.AudioAttributes.Builder()
                     .setUsage(android.media.AudioAttributes.USAGE_ALARM)
                     .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
-            preview.setVolume(gain, gain);
+            final float pvGain = gain;
             String rv = currentRingValue();
             if (rv.startsWith("sys:") || rv.startsWith("doc:")) {
                 preview.setDataSource(this, Uri.parse(rv.substring(4)));
@@ -427,8 +437,10 @@ public class ProfileActivity extends Activity {
                 fd.close();
             }
             preview.prepare();
+            preview.setVolume(pvGain, pvGain);   // 必须在 prepare 后调用（Idle 态会被忽略）
             preview.setOnCompletionListener(m -> stopPreview(btn));
             preview.start();
+            preview.setVolume(pvGain, pvGain);   // 防 start 时系统重置增益
             btn.setText(getString(R.string.stop));
         } catch (Exception e) {
             stopPreview(btn);

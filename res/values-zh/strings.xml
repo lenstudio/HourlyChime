@@ -83,4 +83,8 @@
     <string name="conflict_ask">仍要保存</string>
     <string name="save_anyway">仍要保存</string>
     <string name="hint_drag">长按卡片拖动调整优先级</string>
+    <string name="global_vol">全局音量（一键覆盖所有方案）</string>
+    <string name="global_vol_pct">音量 %1$d%%（覆盖所有方案，闹钟通道）</string>
+    <string name="global_vol_hint">关闭后各方案使用各自音量</string>
+    <string name="vol_overridden">当前由全局音量覆盖（%1$d%%）</string>
 </resources>

@@ -10,6 +10,7 @@ A minimalist Android hourly chime / timed reminder app (`com.len.hourlychime`). 
 - **Rule syntax** — `H:M[-H:M][/step]`, comma-separated, e.g. `9:00-18:00/60, 12:30`
 - **Three ringtone sources** — app built-in / system sounds (enumerated via RingtoneManager) / user-picked file (SAF picker with persisted URI grant)
 - **Independent volume** — temporarily switches STREAM_NOTIFICATION for playback, restores the original level afterwards
+- **Global volume override** — one switch at the bottom of the home screen forces all profiles to play at the same volume
 - **Statutory workday/holiday awareness** — bundled `assets/holidays.json`; profiles distinguish workdays / weekends / public holidays
 - **Reliable firing** — exact AlarmManager alarms + `goAsync()` so playback finishes before the receiver ends; automatic rescheduling on boot, time change and timezone change; self-healing reschedule whenever the main screen resumes
 - Vibration support, immersive status bar

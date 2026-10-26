@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
@@ -165,6 +166,36 @@ public class MainActivity extends Activity {
         add.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
         root.addView(add, Ui.mw(12, this));
 
+        // ── 全局音量卡（最下方，一键覆盖所有方案音量）──
+        LinearLayout gvCard = Ui.card(this, Ui.CARD, 18, 16);
+        Switch gsw = new Switch(this);
+        gsw.setText(getString(R.string.global_vol));
+        gsw.setTextSize(15);
+        gsw.setTextColor(Ui.TEXT);
+        gsw.setChecked(Scheduler.globalVolOn(this));
+        gvCard.addView(gsw);
+        final SeekBar gvol = new SeekBar(this);
+        gvol.setMax(100);
+        gvol.setProgress(Scheduler.globalVol(this));
+        final TextView gvolLabel = Ui.text(this, "", 13, Ui.SUB, false);
+        gvol.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar s, int pr, boolean u) {
+                Scheduler.setGlobalVol(MainActivity.this, pr);
+                updGlobalVol(gsw, gvol, gvolLabel);
+            }
+            @Override public void onStartTrackingTouch(SeekBar s) { }
+            @Override public void onStopTrackingTouch(SeekBar s) { }
+        });
+        gsw.setOnCheckedChangeListener((btn, ck) -> {
+            Scheduler.setGlobalVolOn(MainActivity.this, ck);
+            updGlobalVol(gsw, gvol, gvolLabel);
+        });
+        gvCard.addView(gvol, sep(10));
+        gvolLabel.setPadding(0, dp(4), 0, 0);
+        gvCard.addView(gvolLabel);
+        root.addView(gvCard, Ui.mw(12, this));
+        updGlobalVol(gsw, gvol, gvolLabel);
+
         // 底图固定层：bg 不随内容滚动
         android.widget.FrameLayout fl = new android.widget.FrameLayout(this);
         fl.setBackground(Ui.screenBg(this));
@@ -212,6 +243,15 @@ public class MainActivity extends Activity {
             }
         });
         return t;
+    }
+
+    /** 全局音量卡状态刷新：开关决定滑条可用性与说明文案 */
+    private void updGlobalVol(Switch gsw, SeekBar gvol, TextView gvolLabel) {
+        boolean on = Scheduler.globalVolOn(this);
+        gvol.setEnabled(on);
+        gvol.setAlpha(on ? 1f : 0.4f);
+        gvolLabel.setText(on ? getString(R.string.global_vol_pct, gvol.getProgress())
+                : getString(R.string.global_vol_hint));
     }
 
     private void refresh() {
