@@ -23,6 +23,23 @@ public final class Ui {
 
     private Ui() { }
 
+    /** 页面背景：底色 + assets/bg.png 顶部闹钟水印（铺满拉伸），无 bg.png 时回退纯色 */
+    public static android.graphics.drawable.Drawable screenBg(android.app.Activity a) {
+        android.graphics.drawable.Drawable base = new android.graphics.drawable.ColorDrawable(BG);
+        try {
+            android.graphics.Bitmap bmp = android.graphics.BitmapFactory
+                    .decodeStream(a.getAssets().open("bg.png"));
+            if (bmp == null) return base;
+            android.graphics.drawable.BitmapDrawable bd =
+                    new android.graphics.drawable.BitmapDrawable(a.getResources(), bmp);
+            bd.setGravity(Gravity.FILL);
+            return new android.graphics.drawable.LayerDrawable(
+                    new android.graphics.drawable.Drawable[]{base, bd});
+        } catch (Exception e) {
+            return base;
+        }
+    }
+
     public static GradientDrawable fill(int color, float radiusDp, Context c) {
         GradientDrawable g = new GradientDrawable();
         g.setColor(color);

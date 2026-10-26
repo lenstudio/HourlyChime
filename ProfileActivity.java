@@ -60,7 +60,7 @@ public class ProfileActivity extends Activity {
         int pad = Ui.dpi(20, this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Ui.BG);
+        root.setBackground(Ui.screenBg(this));
         root.setPadding(pad, Ui.statusBarHeight(this) + dp(12), pad, dp(24));
 
         // 返回 + 标题：左上角小箭头

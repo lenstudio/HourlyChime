@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
         int pad = Ui.dpi(20, this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Ui.BG);
+        root.setBackground(Ui.screenBg(this));
         root.setPadding(pad, Ui.statusBarHeight(this) + dp(12), pad, dp(24));
 
         // ── Header：标题居左，当前时间日期居右（TextClock 自动刷新）──
