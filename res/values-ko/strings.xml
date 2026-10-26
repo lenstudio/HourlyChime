@@ -13,7 +13,7 @@
 
     <string name="master_switch">메인 스위치</string>
     <string name="vibrate_together">울릴 때 진동</string>
-    <string name="section_profiles">  알림 프로필</string>
+    <string name="section_profiles">알림 프로필</string>
     <string name="new_profile">＋ 새 프로필</string>
 
     <string name="profile_default">프로필</string>

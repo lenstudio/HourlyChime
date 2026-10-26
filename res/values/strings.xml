@@ -15,7 +15,7 @@
     <!-- Controls -->
     <string name="master_switch">Master switch</string>
     <string name="vibrate_together">Vibrate with ring</string>
-    <string name="section_profiles">  Chime profiles</string>
+    <string name="section_profiles">Chime profiles</string>
     <string name="new_profile">＋ New profile</string>
 
     <!-- Profile list -->

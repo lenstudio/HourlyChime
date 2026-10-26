@@ -140,7 +140,9 @@ public class MainActivity extends Activity {
         sec.setGravity(Gravity.CENTER_VERTICAL);
         View bar = new View(this);
         bar.setBackgroundColor(Ui.ACCENT);
-        sec.addView(bar, new LinearLayout.LayoutParams(dp(4), dp(16)));
+        LinearLayout.LayoutParams barLp = new LinearLayout.LayoutParams(dp(4), dp(16));
+        barLp.rightMargin = dp(8);
+        sec.addView(bar, barLp);
         sec.addView(Ui.text(this, getString(R.string.section_profiles), 15, Ui.TEXT, true));
         View hint = Ui.text(this, getString(R.string.hint_drag), 10, Ui.SUB, false);
         hint.setPadding(dp(8), dp(2), 0, 0);

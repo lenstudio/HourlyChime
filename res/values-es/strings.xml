@@ -13,7 +13,7 @@
 
     <string name="master_switch">Interruptor principal</string>
     <string name="vibrate_together">Vibrar al sonar</string>
-    <string name="section_profiles">  Perfiles</string>
+    <string name="section_profiles">Perfiles</string>
     <string name="new_profile">＋ Nuevo perfil</string>
 
     <string name="profile_default">Perfil</string>

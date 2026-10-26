@@ -13,7 +13,7 @@
 
     <string name="master_switch">メインスイッチ</string>
     <string name="vibrate_together">鳴動時にバイブ</string>
-    <string name="section_profiles">  チャイム設定</string>
+    <string name="section_profiles">チャイム設定</string>
     <string name="new_profile">＋ 新規プロファイル</string>
 
     <string name="profile_default">プロファイル</string>
