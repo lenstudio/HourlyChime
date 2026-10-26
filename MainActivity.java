@@ -67,11 +67,6 @@ public class MainActivity extends Activity {
         hl.setPadding(dp(8), 0, 0, 0);
         hl.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         hl.addView(Ui.text(this, getString(R.string.app_name), 26, Ui.TEXT, true));
-        LinearLayout langRow = new LinearLayout(this);
-        langRow.setPadding(0, dp(6), 0, 0);
-        langRow.addView(langChip("EN", "en"));
-        langRow.addView(langChip("中文", "zh"));
-        hl.addView(langRow);
         android.widget.ImageView logo = new android.widget.ImageView(this);
         try {
             logo.setImageBitmap(android.graphics.BitmapFactory.decodeStream(getAssets().open("icon.png")));
@@ -99,7 +94,13 @@ public class MainActivity extends Activity {
 
         // ── 状态主卡 ──
         LinearLayout hero = Ui.card(this, Ui.CARD, 22, 22);
-        hero.addView(Ui.label(this, getString(R.string.next_alarm)));
+        LinearLayout heroHead = new LinearLayout(this);
+        heroHead.setGravity(Gravity.CENTER_VERTICAL);
+        heroHead.addView(Ui.label(this, getString(R.string.next_alarm)),
+                new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        heroHead.addView(langChip("EN", "en"));
+        heroHead.addView(langChip("中文", "zh"));
+        hero.addView(heroHead);
         bigTime = Ui.text(this, "—", 40, Ui.ACCENT, true);
         bigTime.setPadding(0, dp(6), 0, 0);
         hero.addView(bigTime);
@@ -188,19 +189,19 @@ public class MainActivity extends Activity {
         tick.removeCallbacks(ticker);   // 页面不可见即停，不常驻
     }
 
-    /** 语言切换小胶囊：当前语言高亮，点击切换并重建页面 */
+    /** 语言切换小胶囊（柔和配色）：当前语言高亮，点击切换并重建页面 */
     private TextView langChip(String label, final String code) {
         final boolean active = Lang.pref(this).equals(code);
         TextView t = new TextView(this);
         t.setText(label);
         t.setTextSize(11);
         t.setTypeface(active ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
-        t.setTextColor(active ? Ui.ON_ACCENT : Ui.SUB);
-        t.setBackground(Ui.fill(active ? Ui.ACCENT : Ui.CARD2, 10, this));
+        t.setTextColor(active ? Ui.ACCENT : Ui.SUB);
+        t.setBackground(Ui.fill(active ? 0xFFE1EAFC : 0xFFF0F3F8, 12, this));
         t.setPadding(dp(10), dp(3), dp(10), dp(3));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.rightMargin = dp(6);
+        lp.leftMargin = dp(6);
         t.setLayoutParams(lp);
         t.setOnClickListener(v -> {
             if (!Lang.pref(this).equals(code)) {
