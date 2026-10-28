@@ -20,6 +20,7 @@ import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.Calendar;
 
@@ -49,9 +50,63 @@ public class ChimeService extends Service {
     private final Handler h = new Handler(Looper.getMainLooper());
     private int lastBadgeMinute = -1;
 
+    /**
+     * 单实例保护。同一进程内 Service 只会有一个实例，但更新 APK 后旧进程可能残留
+     * （force-stop 对已 startForeground 的服务不总是生效），新旧两个进程会同时报时。
+     * 这里用「时间戳心跳」判定：新实例启动时若发现 30 秒内有人写过心跳，说明已有活着的实例，
+     * 自己是多余的那个，直接 stopSelf()。
+     */
+    private static final String KEY_HB = "svc_heartbeat_ms";
+    private long myStartAt;
+
+    private boolean anotherAlive() {
+        try {
+            long hb = getSharedPreferences(KEY_HB, MODE_PRIVATE).getLong(KEY_HB, 0);
+            return hb > 0 && Math.abs(System.currentTimeMillis() - hb) < 30_000L
+                    && hb > myStartAt;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static final String KEY_FIRED = "fired_mark";
+
+    /** 该 (日, 分钟) 是否已响过 */
+    private boolean firedOnDisk(int dateKey, int minute) {
+        try {
+            String v = getSharedPreferences(KEY_FIRED, MODE_PRIVATE).getString(KEY_FIRED, "");
+            return v.equals(dateKey + ":" + minute);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** 记录「这一分钟已响」，并打印实际命中类别，便于事后核对 */
+    private void markFired(int dateKey, int minute, JSONObject hit) {
+        try {
+            getSharedPreferences(KEY_FIRED, MODE_PRIVATE).edit()
+                    .putString(KEY_FIRED, dateKey + ":" + minute).apply();
+            System.out.println("[Chime] fire date=" + dateKey + " min=" + minute
+                    + " cat=" + hit.optString("cat")
+                    + " ring=" + hit.optString("ring")
+                    + " vol=" + hit.optInt("vol", -999));
+        } catch (Exception ignored) { }
+    }
+
+    private void beat() {
+        try {
+            getSharedPreferences(KEY_HB, MODE_PRIVATE).edit().putLong(KEY_HB, System.currentTimeMillis()).apply();
+        } catch (Exception ignored) { }
+    }
+
+    private void clearBeat() {
+        try { getSharedPreferences(KEY_HB, MODE_PRIVATE).edit().remove(KEY_HB).apply(); } catch (Exception ignored) { }
+    }
+
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
             try { onTick(); } catch (Throwable ignored) { }
+            beat();
             h.postDelayed(this, TICK);
         }
     };
@@ -69,6 +124,14 @@ public class ChimeService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        myStartAt = System.currentTimeMillis();
+        if (anotherAlive()) {
+            // 已有实例在跑，自己是重复实例（多半是旧 APK 残留进程），直接退出
+            System.out.println("[Chime] duplicate instance detected, stopSelf");
+            stopSelf();
+            return;
+        }
+        beat();
         createChannel();
         try {
             startForeground(NOTI_ID, buildNoti(getString(R.string.noti_waiting, "—"), null));
@@ -84,6 +147,16 @@ public class ChimeService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // 调试入口：adb am start-service 传 --es testCat hour 可立即按该类响一次
+        String test = intent == null ? null : intent.getStringExtra("testCat");
+        if (test != null) {
+            JSONObject hit = debugHit(test);
+            if (hit != null) {
+                ring(hit);
+                updateNoti();
+            }
+            return START_STICKY;
+        }
         if (!Scheduler.enabled(this)) {
             stopSelf();
             return START_NOT_STICKY;
@@ -91,9 +164,33 @@ public class ChimeService extends Service {
         return START_STICKY;
     }
 
+    /** 构造一个假的触发对象，走与真实报时完全相同的 ring() 路径 */
+    private JSONObject debugHit(String cat) {
+        try {
+            JSONArray ps = Scheduler.profiles(this);
+            JSONObject p = ps.optJSONObject(0);          // 工作日
+            if (p == null) return null;
+            JSONArray cats = p.optJSONArray("cats");
+            if (cats == null) return null;
+            for (int i = 0; i < cats.length(); i++) {
+                JSONObject c = cats.optJSONObject(i);
+                if (c == null || !cat.equals(c.optString("k"))) continue;
+                JSONObject out = new JSONObject();
+                out.put("cat", cat);
+                out.put("ring", c.optString("ring", "bell"));
+                out.put("vol", c.optInt("vol", 50));
+                System.out.println("[ChimeTest] cat=" + cat
+                        + " ring=" + out.optString("ring") + " vol=" + out.optInt("vol"));
+                return out;
+            }
+        } catch (Exception ignored) { }
+        return null;
+    }
+
     @Override
     public void onDestroy() {
         h.removeCallbacksAndMessages(null);
+        clearBeat();
         stopRing();
         if (wake != null && wake.isHeld()) wake.release();
         super.onDestroy();
@@ -116,14 +213,22 @@ public class ChimeService extends Service {
             updateNoti();
         }
 
-        // 到点判定：精确到分钟，同一分钟只触发一次
+        // 到点判定：精确到分钟，同一分钟只触发一次（内存 + 磁盘双重锁）
         if (minute != lastFiredMinute || dateKey != lastFiredDateKey) {
-            JSONObject hit = Scheduler.firingCategory(this);
-            if (hit != null) {
+            if (firedOnDisk(dateKey, minute)) {
+                // 进程刚重启过，这一分钟已经被上一个实例响过，绝不重复
                 lastFiredMinute = minute;
                 lastFiredDateKey = dateKey;
-                ring(hit);
-                updateNoti();
+                System.out.println("[Chime] minute " + minute + " already fired (disk lock), skip");
+            } else {
+                JSONObject hit = Scheduler.firingCategory(this);
+                if (hit != null) {
+                    lastFiredMinute = minute;
+                    lastFiredDateKey = dateKey;
+                    markFired(dateKey, minute, hit);
+                    ring(hit);
+                    updateNoti();
+                }
             }
         }
 
@@ -186,27 +291,39 @@ public class ChimeService extends Service {
             if (Scheduler.vibrate(this)) vibrate();
 
             AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-            int vol = hit.optInt("vol", 80);
+            int vol = hit.optInt("vol", 50);
             String r = hit.optString("ring", "bell");
 
             float norm = normalGain(r);
 
-            savedVol = -1;
-            float gain = norm;
-            if (vol >= 0) {
-                int max = am.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-                savedVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
+            // ── 唯一音量算法（试听端 MainActivity 与这里逐行一致）──
+            // 1) 把闹铃通道顶到最大，并回读「真正生效」的值（MIUI 后台会覆盖，必须校验）
+            // 2) 增益 = 母带头寸 × 用户百分比^1.6 × 通道差额补偿
+            // 这样无论通道被顶到 15 还是被按回 4，最终声压都等于用户设定值。
+            int max = am.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+            savedVol = am.getStreamVolume(AudioManager.STREAM_ALARM);
+            if (savedVol != max) {
                 am.setStreamVolume(AudioManager.STREAM_ALARM, max, 0);
-                // 音量映射改为等响度曲线：百分比是「感知响度」而非线性振幅，
-                // 0% 静音、100% 满幅。旧版线性 80% 实际只到 -1.9dB，主观偏小。
+            }
+            int eff = am.getStreamVolume(AudioManager.STREAM_ALARM);
+
+            float gain;
+            if (vol < 0) {
+                // 「跟随」：用户不想指定，直接按系统当前通道音量播（不做增益压缩）
+                gain = norm;
+            } else {
                 float pct = Math.max(0f, Math.min(1f, vol / 100f));
-                gain = norm * (float) Math.pow(pct, 1.6);
+                float deficit = (float) max / Math.max(1, eff);
+                deficit = Math.min(deficit, 4f);          // 上限 +12dB，避免削波
+                gain = norm * (float) Math.pow(pct, 1.6) * deficit;
             }
             mp = new MediaPlayer();
             mp.setAudioAttributes(new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
             mp.setVolume(gain, gain);
+            System.out.println("[ChimeTest] vol=" + vol + " eff=" + eff + "/" + max
+                    + " norm=" + norm + " gain=" + gain);
 
             if (r.startsWith("sys:") || r.startsWith("doc:")) {
                 mp.setDataSource(this, Uri.parse(r.substring(4)));
@@ -248,7 +365,7 @@ public class ChimeService extends Service {
     }
 
     private void stopRing() {
-        try { if (mp != null) { mp.release(); } } catch (Exception ignored) { }
+        try { if (mp != null) { mp.setVolume(0f, 0f); mp.stop(); mp.release(); } } catch (Exception ignored) { }
         mp = null;
         ringing = false;
         ringingUntil = 0;

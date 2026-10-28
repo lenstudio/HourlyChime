@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 通知栏小图标：纯白剪影，系统会按状态栏色调二次着色 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M238.336,85.333333L298.666667,145.749333L102.997333,341.333333L42.666667,280.917333L238.336,85.333333zM785.664,85.333333L981.333333,280.917333L921.002667,341.333333L725.333333,145.749333L785.664,85.333333zM512,938.666667a384,384 0,1 1,0 -768a384,384 0,0 1,0 768zM512,853.333333a298.666667,298.666667 0,1 0,0 -597.333333a298.666667,298.666667 0,0 0,0 597.333333z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M682.794667,611.669333L635.434667,682.666667L469.333333,577.493333L469.333333,384L554.666667,384L554.666667,531.84z" />
+</vector>

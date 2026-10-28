@@ -16,3 +16,10 @@ dexout/
 *.apk
 _loudness_orig/
 _loud_work/
+
+# 调试截图与临时备份
+_*.png
+*.bak
+
+# WorkBuddy 构建缓存
+.workbuddy/build-*/
