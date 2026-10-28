@@ -177,9 +177,8 @@ public class ChimeService extends Service {
 
     // ── 播放 ──
 
-    /** 响度均衡目标：RMS -19.5dBFS；峰值头寸 -9.4dBFS（单声道 ≈ 34% 振幅）。 */
-    private static final float TARGET_RMS = -19.5f;
-    private static final float HEADROOM_PEAK = -9.4f;
+    /** 素材已统一母带为 -20 LUFS，代码侧只做「统一响度 → 用户百分比」映射，不再逐铃声补偿。 */
+    private static final float MASTER_GAIN = 0.35f;   // = -9.1dB，单声道峰值 ≈ -12dBFS，不削波
 
     private void ring(JSONObject hit) {
         try {
@@ -190,9 +189,6 @@ public class ChimeService extends Service {
             int vol = hit.optInt("vol", 80);
             String r = hit.optString("ring", "bell");
 
-            // 响度均衡：先按实测 RMS 把素材归一到同一「响度」，再按峰值限制把增益封顶，
-            // 避免把峰值低的素材硬推上去削波（旧版只用 peak，ring6 被 +22.5dB → 17% 谐波失真）。
-            // 头寸 0.35（≈ -9dBFS 峰值），单声道下相当于约 60% 振幅，与 MIUI 铃声 / 系统提示音同档。
             float norm = normalGain(r);
 
             savedVol = -1;
@@ -242,31 +238,13 @@ public class ChimeService extends Service {
     }
 
     /**
-     * 响度均衡增益：所有内置铃声补到同一「感知响度」。
-     * 依据 = ffmpeg astats 实测（RMS_level / Peak_level，48kHz 解码后全通道），
-     * 目标 RMS -19.5dBFS、增益上限 headroom 0.35 对应峰值 -9.4dBFS。
-     * 重新编码或新增铃声须重测这两个值并更新表；改完跑 tools/measure_loudness.sh 校验。
+     * 播放增益。素材端已在母带阶段统一到 -20 LUFS / 峰值 ≤ -3dBFS（见 tools/master_rings.sh，
+     * 母版备份在 _loudness_orig/），因此这里只做两件事：
+     * ① 乘统一头寸 MASTER_GAIN；② 自定义文件/系统音效响度未知，只给保守值不放大。
      */
     public static float normalGain(String ring) {
-        // 自定义文件/系统音效峰值与响度未知 → 不动，避免削波
-        if (ring.startsWith("sys:") || ring.startsWith("doc:")) return 1f;
-        float rms;      // 实测 RMS(dBFS)
-        float peak;     // 实测 Peak(dBFS)
-        switch (ring) {
-            case "sing": rms = -25.05f; peak = -0.87f; break;  // ring1.mp3
-            case "bell": rms = -21.81f; peak = -0.54f; break;  // ring2.mp3
-            case "wind": rms = -31.43f; peak = -8.17f; break;  // ring3.ogg
-            case "d1":   rms = -23.84f; peak = -3.70f; break;  // ring5.mp3
-            case "d2":   rms = -40.73f; peak = -23.00f; break; // ring6.mp3
-            case "d3":   rms = -33.67f; peak = -13.64f; break; // ring7.mp3
-            case "d4":   rms = -24.39f; peak = 1.65f;  break;  // ring8.mp3（真峰值已过 0dB）
-            default:     rms = -24.40f; peak = -5.83f; break;  // ring4.ogg
-        }
-        float want = TARGET_RMS - rms;            // 响度需要提升的 dB
-        float cap = HEADROOM_PEAK - peak;         // 峰值允许的最大提升 dB
-        float db = Math.min(want, cap);
-        if (db > 0f) db = 0f;                     // 已够响的低动态素材不推，避免削波
-        return (float) Math.pow(10, db / 20f);
+        if (ring.startsWith("sys:") || ring.startsWith("doc:")) return 0.6f;
+        return MASTER_GAIN;
     }
 
     private void stopRing() {
